@@ -888,7 +888,7 @@
 		"tslint-microsoft-contrib": "^6.2.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
 		"typescript": "^5.0.2",
-		"typescript-esbuild": "latest",
+		"typescript-esbuild": "0.4.5",
 		"vrsource-tslint-rules": "^6.0.0",
 		"vsce": "^1.95.0",
 		"vscode-nls-dev": "^3.3.2",
