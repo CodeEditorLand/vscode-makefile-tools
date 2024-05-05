@@ -1,5 +1,10 @@
 # What's New?
 
+## 0.10
+Improvements:
+
+- Remove dry-run pop-up and improve initial configureOnOpen experience. [#573](https://github.com/microsoft/vscode-makefile-tools/pull/573)
+
 ## 0.9
 Bug Fixes:
 
@@ -8,6 +13,7 @@ Bug Fixes:
 Improvements:
 
 - Add telemetry about how many users are hitting the dry-run warning and how many users are stopping the dry-run process due to it. [#565](https://github.com/microsoft/vscode-makefile-tools/pull/565)
+- Remove preprocessed regular expressions to reduce time. [#580](https://github.com/microsoft/vscode-makefile-tools/pull/580)
 
 ## 0.8
 Bug Fixes:

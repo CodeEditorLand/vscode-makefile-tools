@@ -4,35 +4,36 @@
 	"version": "0.0.1",
 	"private": false,
 	"description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMakefileTools#readme",
 	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandMakefileTools/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandMakefileTools.git"
 	},
 	"license": "SEE LICENSE IN LICENSE",
 	"qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
 	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
 	"type": "module",
 	"main": "./dist/main",
 	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
 		"bundle-assets": "gulp bundle-assets",
 		"compile": "yarn install && webpack --mode development",
 		"compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets && webpack --env BUILD_VSCODE_NLS=true --mode production",
 		"compile-watch": "yarn install && webpack --mode development --watch --progress",
-		"package": "vsce package --yarn -o makefile-tools.vsix",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
 		"translations-export": "gulp translations-export",
 		"translations-generate": "gulp translations-generate",
-		"translations-import": "gulp translations-import",
-		"vscode:prepublish": "yarn compile-production",
-		"watch": "tsc -watch -p ./"
+		"translations-import": "gulp translations-import"
 	},
 	"contributes": {
 		"commands": [
@@ -307,7 +308,7 @@
 					"type": "boolean"
 				},
 				"makefile.configureOnOpen": {
-					"default": true,
+					"default": null,
 					"description": "%makefile-tools.configuration.makefile.configureOnOpen.description%",
 					"scope": "resource",
 					"type": "boolean"
@@ -845,55 +846,37 @@
 		"workspaceContains:**/GNUmakefile"
 	],
 	"resolutions": {
-		"ansi-regex": "^5.0.1",
-		"glob-parent": "^5.1.2",
-		"markdown-it": "^12.3.2",
-		"minimatch": "^3.0.5",
-		"minimist": "^1.2.6",
-		"nanoid": "^3.1.20",
-		"xml2js": "^0.5.0"
+		"ansi-regex": "5.0.1",
+		"glob-parent": "5.1.2",
+		"markdown-it": "12.3.2",
+		"minimatch": "3.0.5",
+		"minimist": "1.2.6",
+		"nanoid": "3.1.20",
+		"xml2js": "0.5.0"
 	},
 	"dependencies": {
-		"@types/glob": "^7.1.1",
-		"@vscode/extension-telemetry": "^0.6.2",
-		"glob": "^7.1.6",
-		"module-alias": "^2.2.2",
-		"uuid": "^9.0.1",
-		"vscode-cpptools": "^6.1.0",
-		"vscode-jsonrpc": "^3.6.2",
-		"vscode-nls": "^5.0.0"
+		"@types/glob": "8.1.0",
+		"glob": "10.3.12",
+		"module-alias": "2.2.3",
+		"uuid": "9.0.1"
 	},
 	"devDependencies": {
-		"@octokit/rest": "^18.1.1",
-		"@types/chai": "^4.2.15",
-		"@types/chai-as-promised": "^7.1.3",
-		"@types/chai-string": "^1.4.2",
-		"@types/mocha": "^9.0.0",
-		"@types/node": "^10.17.17",
-		"@types/uuid": "^9.0.7",
-		"@types/vscode": "^1.74.0",
-		"@vscode/test-electron": "^2.3.8",
-		"chai": "^4.3.0",
-		"chai-as-promised": "^7.1.1",
-		"chai-string": "^1.5.0",
-		"fs-extra": "^9.1.0",
-		"gulp": "^4.0.2",
-		"gulp-filter": "^6.0.0",
-		"gulp-mocha": "^8.0.0",
-		"gulp-sourcemaps": "^3.0.0",
-		"gulp-typescript": "^5.0.1",
-		"jsonc-parser": "^3.0.0",
-		"parse-git-config": "^3.0.0",
-		"ts-loader": "^8.0.17",
-		"tslint-microsoft-contrib": "^6.2.0",
-		"tslint-no-unused-expression-chai": "^0.1.4",
-		"typescript": "^5.0.2",
-		"typescript-esbuild": "0.4.5",
-		"vrsource-tslint-rules": "^6.0.0",
-		"vsce": "^1.95.0",
-		"vscode-nls-dev": "^3.3.2",
-		"webpack": "^5.76.0",
-		"webpack-cli": "^4.5.0"
+		"@octokit/rest": "20.1.0",
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
+		"@types/chai": "4.3.14",
+		"@types/chai-as-promised": "7.1.8",
+		"@types/chai-string": "1.4.5",
+		"@types/node": "20.12.7",
+		"@types/uuid": "9.0.8",
+		"chai": "5.1.0",
+		"chai-as-promised": "7.1.1",
+		"chai-string": "1.5.0",
+		"fs-extra": "11.2.0",
+		"jsonc-parser": "3.2.1",
+		"parse-git-config": "3.0.0",
+		"ts-loader": "9.5.1",
+		"vrsource-tslint-rules": "6.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
