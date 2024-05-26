@@ -834,7 +834,7 @@
 	},
 	"dependencies": {
 		"@types/glob": "8.1.0",
-		"glob": "10.3.16",
+		"glob": "10.4.1",
 		"module-alias": "2.2.3",
 		"uuid": "9.0.1"
 	},
