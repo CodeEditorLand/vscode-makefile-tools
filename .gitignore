@@ -1,0 +1,13 @@
+out
+dist
+node_modules
+.vscode-test/
+*.log
+*.vsix
+vscode-extensions-localization-export/
+vscode-translations-import/
+jobs/loc/LCL
+OneLocBuild
+**/nls.*.json
+**/*.nls.json
+**/package.nls.*.json
