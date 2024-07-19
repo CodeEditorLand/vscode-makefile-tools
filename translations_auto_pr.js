@@ -46,10 +46,10 @@ if (
   );
   console.error(`   auth_token - A PAT associated with auth_user.`);
   console.error(
-    `   user_full_name - A full name to associate with a git commit. (This is replaced by the PR account if commit is squashed.)`
+    `   user_full_name - A full name to associate with a git ecommit. (This is replaced by the PR account if commit is squashed.)`
   );
   console.error(
-    `   user_email - An email to associate with a git commit. (This is replaced by the PR account if commit is squashed.)`
+    `   user_email - An email to associate with a git ecommit. (This is replaced by the PR account if commit is squashed.)`
   );
   console.error(
     `   loc_root_path - The path to the folder with language-specific directories (containing localized xlf files).`
@@ -217,8 +217,8 @@ cp.execSync(
 );
 
 // Commit changed files.
-console.log(`Commiting changes (git commit -m "${commitComment}")`);
-cp.execSync(`git commit -m "${commitComment}"`);
+console.log(`Commiting changes (git ecommit -m "${commitComment}")`);
+cp.execSync(`git ecommit -m "${commitComment}"`);
 
 if (existingUserName === undefined) {
   console.log(`Restoring original user name: undefined`);
