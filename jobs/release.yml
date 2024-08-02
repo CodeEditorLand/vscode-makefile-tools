@@ -60,39 +60,38 @@ variables:
     : SignType: test
 
 extends:
-    template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
-    parameters:
-        pool:
-            name: VSEngSS-MicroBuild2022-1ES
-        sdl:
-            sourceAnalysisPool:
-                name: VSEngSS-MicroBuild2022-1ES
-        customBuildTags:
-            - ES365AIMigrationTooling
-        stages:
-            - stage: stage
-              jobs:
-                  - job: Job_1
-                    displayName: Build release
-                    templateContext:
-                        outputs:
-                            - output: pipelineArtifact
-                              displayName: "Publish VSIX"
-                              targetPath: $(Build.ArtifactStagingDirectory)/vsix
-                              artifactName: vsix
-                              sbomBuildDropPath: $(Build.ArtifactStagingDirectory)
-                        # No need for the SBOM, it's now located in the vsix artifact
-                    steps:
-                        - checkout: self
-                          clean: true
-                          fetchTags: false
-                        - ${{ if not(eq(parameters.VerifyChangelog, 'yes')) }}:
-                              - "CHANGELOG.md should be updated before
-                                scheduling the pipeline."
-                        - ${{ if not(eq(parameters.VerifyNotice, 'yes')) }}:
-                              - "Third party notices should be updated before
-                                scheduling the pipeline."
-                        - ${{ if not(eq(parameters.ReleaseVersion, 'yes')) }}:
-                              - "ReleaseVersion needs to be set before
-                                scheduling the pipeline."
-                        - template: /jobs/shared/build.yml@self
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  parameters:
+    pool:
+      name: VSEngSS-MicroBuild2022-1ES
+    sdl:
+      sourceAnalysisPool:
+        name: VSEngSS-MicroBuild2022-1ES
+    customBuildTags:
+      - ES365AIMigrationTooling
+    stages:
+      - stage: stage
+        jobs:
+          - job: Job_1
+            displayName: Build release
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  displayName: "Publish VSIX"
+                  targetPath: $(Build.ArtifactStagingDirectory)/vsix
+                  artifactName: vsix
+                  sbomBuildDropPath: $(Build.ArtifactStagingDirectory)
+              # No need for the SBOM, it's now located in the vsix artifact
+            steps:
+              - checkout: self
+                clean: true
+                fetchTags: false
+              - ${{ if not(eq(parameters.VerifyChangelog, 'yes')) }}:
+                  - "CHANGELOG.md should be updated before scheduling the pipeline."
+              - ${{ if not(eq(parameters.VerifyNotice, 'yes')) }}:
+                  - "Third party notices should be updated before scheduling the pipeline."
+              - ${{ if eq(parameters.ReleaseVersion, 'unset') }}:
+                  - "ReleaseVersion needs to be set before scheduling the pipeline."
+              - template: /jobs/shared/build.yml@self
+                parameters:
+                  ReleaseVersion: ${{ parameters.ReleaseVersion }}
