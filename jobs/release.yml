@@ -2,60 +2,62 @@
 # Licensed under the MIT License.
 
 parameters:
-  - name: SignTypeOverride
-    displayName: Signing Type Override
-    type: string
-    default: default
-    values:
-      - default
-      - test
-      - real
-  - name: VerifyChangelog
-    displayName: Attest that CHANGELOG.md is up-to-date.
-    type: string
-    default: no
-    values:
-      - yes
-      - no
-  - name: VerifyNotice
-    displayName: Attest that all NOTICE files are up-to-date.
-    type: string
-    default: no
-    values:
-      - yes
-      - no
-  - name: ReleaseVersion
-    displayName: Release Version to set in the vsix package
-    type: string
-    default: unset
+    - name: SignTypeOverride
+      displayName: Signing Type Override
+      type: string
+      default: default
+      values:
+          - default
+          - test
+          - real
+    - name: VerifyChangelog
+      displayName: Attest that CHANGELOG.md is up-to-date.
+      type: string
+      default: no
+      values:
+          - yes
+          - no
+    - name: VerifyNotice
+      displayName: Attest that all NOTICE files are up-to-date.
+      type: string
+      default: no
+      values:
+          - yes
+          - no
+    - name: ReleaseVersion
+      displayName: Release Version to set in the vsix package
+      type: string
+      default: unset
 
 trigger: none
 
 resources:
-  repositories:
-    - repository: self
-      type: git
-      ref: refs/heads/main
-    - repository: MicroBuildTemplate
-      type: git
-      name: 1ESPipelineTemplates/MicroBuildTemplate
-      ref: refs/tags/release
+    repositories:
+        - repository: self
+          type: git
+          ref: refs/heads/main
+        - repository: MicroBuildTemplate
+          type: git
+          name: 1ESPipelineTemplates/MicroBuildTemplate
+          ref: refs/tags/release
 
 name: $(Date:yyyyMMdd).$(Rev:r)
 
 variables:
-  IsPreRelease: 0
-  # ReleaseVersion is set in the versions tab so it can be edited.
-  # VerifyNotice is set in the versions tab so it can be edited.
-  # VerifyChangelog is set in the versions tab so it can be edited.
-  TeamName: C++ Cross Platform and Cloud
-  # If the user didn't override the signing type, then only real-sign on main.
-  ${{ if ne(parameters.SignTypeOverride, 'default') }}:
-    SignType: ${{ parameters.SignTypeOverride }}
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), eq(variables['Build.SourceBranchName'], 'main')) }}:
-    SignType: real
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(eq(variables['Build.SourceBranchName'], 'main'))) }}:
-    SignType: test
+    IsPreRelease: 0
+    # ReleaseVersion is set in the versions tab so it can be edited.
+    # VerifyNotice is set in the versions tab so it can be edited.
+    # VerifyChangelog is set in the versions tab so it can be edited.
+    TeamName: C++ Cross Platform and Cloud
+    # If the user didn't override the signing type, then only real-sign on main.
+    ${{ if ne(parameters.SignTypeOverride, 'default') }}:
+        SignType: ${{ parameters.SignTypeOverride }}
+    ? ${{ if and(eq(parameters.SignTypeOverride, 'default'),
+      eq(variables['Build.SourceBranchName'], 'main')) }}
+    : SignType: real
+    ? ${{ if and(eq(parameters.SignTypeOverride, 'default'),
+      not(eq(variables['Build.SourceBranchName'], 'main'))) }}
+    : SignType: test
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
