@@ -1,17 +1,49 @@
 {
-	"name": "makefile-tools",
-	"displayName": "Makefile Tools",
-	"description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-	"qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
-	"main": "./dist/main",
-	"scripts": {
-		"bundle-assets": "gulp bundle-assets",
-		"compile": "yarn install && webpack --mode development",
-		"compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets && webpack --env BUILD_VSCODE_NLS=true --mode production",
-		"compile-watch": "yarn install && webpack --mode development --watch --progress",
-		"translations-export": "gulp translations-export",
-		"translations-generate": "gulp translations-generate",
-		"translations-import": "gulp translations-import"
+	"activationEvents": [
+		"onCommand:makefile.setBuildConfiguration",
+		"onCommand:makefile.getConfiguration",
+		"onCommand:makefile.setBuildTarget",
+		"onCommand:makefile.getBuildTarget",
+		"onCommand:makefile.buildTarget",
+		"onCommand:makefile.buildCleanTarget",
+		"onCommand:makefile.buildAll",
+		"onCommand:makefile.buildCleanAll",
+		"onCommand:makefile.setLaunchConfiguration",
+		"onCommand:makefile.launchDebug",
+		"onCommand:makefile.launchRun",
+		"onCommand:makefile.launchTargetPath",
+		"onCommand:makefile.getLaunchTargetPath",
+		"onCommand:makefile.launchTargetFileName",
+		"onCommand:makefile.getLaunchTargetFileName",
+		"onCommand:makefile.getLaunchTargetDirectory",
+		"onCommand:makefile.getLaunchTargetArgs",
+		"onCommand:makefile.getLaunchTargetArgsConcat",
+		"onCommand:makefile.makeBaseDirectory",
+		"onCommand:makefile.configure",
+		"onCommand:makefile.cleanConfigure",
+		"onCommand:makefile.preConfigure",
+		"onCommand:makefile.postConfigure",
+		"onCommand:makefile.outline.setBuildConfiguration",
+		"onCommand:makefile.outline.setBuildTarget",
+		"onCommand:makefile.outline.buildTarget",
+		"onCommand:makefile.outline.buildCleanTarget",
+		"onCommand:makefile.outline.setLaunchConfiguration",
+		"onCommand:makefile.outline.launchDebug",
+		"onCommand:makefile.outline.launchRun",
+		"onCommand:makefile.outline.configure",
+		"onCommand:makefile.outline.cleanConfigure",
+		"onCommand:makefile.outline.preConfigure",
+		"onCommand:makefile.outline.postConfigure",
+		"onCommand:makefile.resetState",
+		"workspaceContains:**/makefile",
+		"workspaceContains:**/Makefile",
+		"workspaceContains:**/GNUmakefile"
+	],
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"description": "",
+			"supported": false
+		}
 	},
 	"contributes": {
 		"commands": [
@@ -784,61 +816,13 @@
 			]
 		}
 	},
-	"activationEvents": [
-		"onCommand:makefile.setBuildConfiguration",
-		"onCommand:makefile.getConfiguration",
-		"onCommand:makefile.setBuildTarget",
-		"onCommand:makefile.getBuildTarget",
-		"onCommand:makefile.buildTarget",
-		"onCommand:makefile.buildCleanTarget",
-		"onCommand:makefile.buildAll",
-		"onCommand:makefile.buildCleanAll",
-		"onCommand:makefile.setLaunchConfiguration",
-		"onCommand:makefile.launchDebug",
-		"onCommand:makefile.launchRun",
-		"onCommand:makefile.launchTargetPath",
-		"onCommand:makefile.getLaunchTargetPath",
-		"onCommand:makefile.launchTargetFileName",
-		"onCommand:makefile.getLaunchTargetFileName",
-		"onCommand:makefile.getLaunchTargetDirectory",
-		"onCommand:makefile.getLaunchTargetArgs",
-		"onCommand:makefile.getLaunchTargetArgsConcat",
-		"onCommand:makefile.makeBaseDirectory",
-		"onCommand:makefile.configure",
-		"onCommand:makefile.cleanConfigure",
-		"onCommand:makefile.preConfigure",
-		"onCommand:makefile.postConfigure",
-		"onCommand:makefile.outline.setBuildConfiguration",
-		"onCommand:makefile.outline.setBuildTarget",
-		"onCommand:makefile.outline.buildTarget",
-		"onCommand:makefile.outline.buildCleanTarget",
-		"onCommand:makefile.outline.setLaunchConfiguration",
-		"onCommand:makefile.outline.launchDebug",
-		"onCommand:makefile.outline.launchRun",
-		"onCommand:makefile.outline.configure",
-		"onCommand:makefile.outline.cleanConfigure",
-		"onCommand:makefile.outline.preConfigure",
-		"onCommand:makefile.outline.postConfigure",
-		"onCommand:makefile.resetState",
-		"workspaceContains:**/makefile",
-		"workspaceContains:**/Makefile",
-		"workspaceContains:**/GNUmakefile"
-	],
-	"resolutions": {
-		"ansi-regex": "5.0.1",
-		"glob-parent": "5.1.2",
-		"markdown-it": "12.3.2",
-		"minimatch": "3.0.5",
-		"minimist": "1.2.6",
-		"nanoid": "3.1.20",
-		"xml2js": "0.5.0"
-	},
 	"dependencies": {
 		"@types/glob": "8.1.0",
 		"glob": "11.0.0",
 		"module-alias": "2.2.3",
 		"uuid": "10.0.0"
 	},
+	"description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
 	"devDependencies": {
 		"@octokit/rest": "21.0.2",
 		"@types/chai": "5.0.0",
@@ -855,13 +839,29 @@
 		"ts-loader": "9.5.1",
 		"vrsource-tslint-rules": "6.0.0"
 	},
+	"displayName": "Makefile Tools",
 	"icon": "res/makefile-logo.png",
+	"main": "./dist/main",
+	"name": "makefile-tools",
 	"preview": true,
-	"capabilities": {
-		"untrustedWorkspaces": {
-			"description": "",
-			"supported": false
-		}
+	"qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+	"readme": "README.md",
+	"resolutions": {
+		"ansi-regex": "5.0.1",
+		"glob-parent": "5.1.2",
+		"markdown-it": "12.3.2",
+		"minimatch": "3.0.5",
+		"minimist": "1.2.6",
+		"nanoid": "3.1.20",
+		"xml2js": "0.5.0"
 	},
-	"readme": "README.md"
+	"scripts": {
+		"bundle-assets": "gulp bundle-assets",
+		"compile": "yarn install && webpack --mode development",
+		"compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets && webpack --env BUILD_VSCODE_NLS=true --mode production",
+		"compile-watch": "yarn install && webpack --mode development --watch --progress",
+		"translations-export": "gulp translations-export",
+		"translations-generate": "gulp translations-generate",
+		"translations-import": "gulp translations-import"
+	}
 }
