@@ -820,7 +820,7 @@
 		"@types/glob": "8.1.0",
 		"glob": "11.0.0",
 		"module-alias": "2.2.3",
-		"uuid": "10.0.0"
+		"uuid": "11.0.1"
 	},
 	"description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
 	"devDependencies": {
@@ -828,7 +828,7 @@
 		"@types/chai": "5.0.0",
 		"@types/chai-as-promised": "8.0.1",
 		"@types/chai-string": "1.4.5",
-		"@types/node": "22.7.9",
+		"@types/node": "22.8.1",
 		"@types/uuid": "10.0.0",
 		"chai": "5.1.2",
 		"chai-as-promised": "8.0.0",
