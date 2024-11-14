@@ -820,7 +820,7 @@
 		"@types/glob": "8.1.0",
 		"glob": "11.0.0",
 		"module-alias": "2.2.3",
-		"uuid": "11.0.2"
+		"uuid": "11.0.3"
 	},
 	"description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
 	"devDependencies": {
