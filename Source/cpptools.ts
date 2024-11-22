@@ -18,6 +18,7 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export interface SourceFileConfigurationItem
@@ -44,6 +45,7 @@ export class CppConfigurationProvider
 		uri: vscode.Uri,
 	): SourceFileConfigurationItem | undefined {
 		let norm_path: string = path.normalize(uri.fsPath);
+
 		if (process.platform === "win32") {
 			norm_path = norm_path.toUpperCase();
 		}
@@ -53,6 +55,7 @@ export class CppConfigurationProvider
 		// try also the temporary index of the current configure.
 		let sourceFileConfiguration: SourceFileConfigurationItem | undefined =
 			this.fileIndex.get(norm_path);
+
 		if (!sourceFileConfiguration && make.getIsConfiguring()) {
 			sourceFileConfiguration = make
 				.getDeltaCustomConfigurationProvider()
@@ -220,6 +223,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		if (
 			process.platform === "win32" &&
 			this.workspaceBrowseConfiguration.windowsSdkVersion
@@ -244,11 +248,13 @@ export class CppConfigurationProvider
 		fromCache: boolean = false,
 	): void {
 		let uriObj: vscode.Uri = <vscode.Uri>filePath.uri;
+
 		const fromCacheString = localize(
 			"sending.configuration.from.cache",
 			"Sending configuration (from cache) for file {0} -----------------------------------",
 			uriObj.fsPath,
 		);
+
 		const notFromCacheString = localize(
 			"sending.configuration.for.file",
 			"Sending configuration for file {0} -----------------------------------",
@@ -274,6 +280,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		if (filePath.configuration.forcedInclude) {
 			logger.message(
 				localize(
@@ -316,6 +323,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		if (
 			process.platform === "win32" &&
 			filePath.configuration.windowsSdkVersion

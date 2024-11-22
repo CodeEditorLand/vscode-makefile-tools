@@ -15,6 +15,7 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 interface NamedItem {
@@ -56,6 +57,7 @@ export class BuildTargetNode extends BaseNode {
 				"The makefile target currently selected for build.",
 			);
 			item.contextValue = [`nodeType=buildTarget`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -81,6 +83,7 @@ export class LaunchTargetNode extends BaseNode {
 			await configuration.stringToLaunchConfiguration(
 				completeLaunchTargetName,
 			);
+
 		let shortName: string;
 
 		if (!launchConfiguration) {
@@ -131,6 +134,7 @@ export class LaunchTargetNode extends BaseNode {
 				"The launch target currently selected for debug and run in terminal.",
 			);
 			item.contextValue = [`nodeType=launchTarget`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -173,6 +177,7 @@ export class ConfigurationNode extends BaseNode {
 				"The makefile configuration currently selected from settings ('makefile.configurations').",
 			);
 			item.contextValue = [`nodeType=configuration`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -215,6 +220,7 @@ export class MakefilePathInfoNode extends BaseNode {
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 			item.tooltip = this._tooltip;
 			item.contextValue = [`nodeType=makefilePathInfo`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -257,6 +263,7 @@ export class MakePathInfoNode extends BaseNode {
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 			item.tooltip = this._tooltip;
 			item.contextValue = [`nodeType=makePathInfo`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -299,6 +306,7 @@ export class BuildLogPathInfoNode extends BaseNode {
 				"The path to the build log that is read to bypass a dry-run.",
 			);
 			item.contextValue = [`nodeType=buildLogPathInfo`].join(",");
+
 			return item;
 		} catch (e) {
 			return new vscode.TreeItem(
@@ -392,6 +400,7 @@ export class ProjectOutlineProvider
 				extension.updateMakefileFilePresent(false);
 			}
 			const unset = localize("Unset", "Unset");
+
 			return `${kind}: [${unset}]`;
 		}
 
@@ -401,14 +410,18 @@ export class ProjectOutlineProvider
 			kind === "Make"
 				? pathInSettings?.concat(".exe")
 				: pathInSettings;
+
 		const pathBase: string | undefined =
 			searchInPath && path.parse(pathInSettingsToTest).dir === ""
 				? path.parse(pathInSettingsToTest).base
 				: undefined;
+
 		const pathInEnv: string | undefined = pathBase
 			? path.join(util.toolPathInEnv(pathBase) || "", pathBase)
 			: undefined;
+
 		const finalPath: string = pathInEnv || pathInSettingsToTest;
+
 		const checkFileExists = util.checkFileExistsSync(finalPath);
 
 		if (kind === "Build Log") {

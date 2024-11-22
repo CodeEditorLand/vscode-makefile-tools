@@ -18,6 +18,7 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 let statusBar: ui.UI = ui.getUI();
@@ -92,6 +93,7 @@ export async function setCurrentMakefileConfiguration(
 export function readCurrentMakefileConfiguration(): void {
 	let buildConfiguration: string | undefined =
 		extension.getState().buildConfiguration;
+
 	if (!buildConfiguration) {
 		logger.message(
 			localize(
@@ -123,6 +125,7 @@ type MakefilePanelVisibility = {
 // internal, runtime representation of an optional feature
 type MakefilePanelVisibilityDescription = {
 	propertyName: string;
+
 	default: boolean;
 	value: boolean;
 	enablement?: string;
@@ -178,6 +181,7 @@ async function updateOptionalFeaturesWithWorkspace(): Promise<void> {
 		(await util.getExpandedSetting<MakefilePanelVisibility>(
 			"panel.visibility",
 		)) || undefined;
+
 	if (features) {
 		if (Object.entries(features).length < panelVisibility.features.length) {
 			// At least one feature is missing from the settings, which means we need to use defaults.
@@ -240,6 +244,7 @@ export function setMakePath(path: string): void {
 // in "makefile.configurations.makePath".
 async function readMakePath(): Promise<void> {
 	makePath = await util.getExpandedSetting<string>("makePath");
+
 	if (!makePath) {
 		logger.message(
 			localize(
@@ -263,6 +268,7 @@ export function setMakefilePath(path: string): void {
 // TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.makeArgs.
 async function readMakefilePath(): Promise<void> {
 	makefilePath = await util.getExpandedSetting<string>("makefilePath");
+
 	if (!makefilePath) {
 		logger.message(
 			localize(
@@ -288,6 +294,7 @@ export function setMakeDirectory(dir: string): void {
 // TODO: validate and integrate with "-C [DIR_PATH]" passed in makefile.configurations.makeArgs.
 async function readMakeDirectory(): Promise<void> {
 	makeDirectory = await util.getExpandedSetting<string>("makeDirectory");
+
 	if (!makeDirectory) {
 		logger.message(
 			localize(
@@ -310,12 +317,15 @@ export function makeBaseDirectory(): string {
 	// We don't need to know here which -C gets pushed last (global makeDirectory,
 	// configuration local makeDirectory or one in makeArgs). Just reverse to easily get the last one.
 	const makeArgs: string[] = getConfigurationMakeArgs().concat().reverse();
+
 	let prevArg: string = "";
+
 	for (const arg of makeArgs) {
 		if (arg === "-C") {
 			return prevArg;
 		} else if (arg.startsWith("--directory")) {
 			const eqIdx: number = arg.indexOf("=");
+
 			return arg.substring(eqIdx + 1, arg.length);
 		}
 
@@ -356,6 +366,7 @@ export function setBuildLog(path: string): void {
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
 export async function readBuildLog(): Promise<boolean> {
 	buildLog = await util.getExpandedSetting<string>("buildLog");
+
 	if (buildLog) {
 		buildLog = util.resolvePathToRoot(buildLog);
 		logger.message(
@@ -365,6 +376,7 @@ export async function readBuildLog(): Promise<boolean> {
 				buildLog,
 			),
 		);
+
 		if (!util.checkFileExistsSync(buildLog)) {
 			logger.message(
 				localize(
@@ -372,6 +384,7 @@ export async function readBuildLog(): Promise<boolean> {
 					"Build log not found on disk.",
 				),
 			);
+
 			return false;
 		}
 	}
@@ -410,6 +423,7 @@ export async function readExtensionOutputFolder(): Promise<void> {
 	extensionOutputFolder = await util.getExpandedSetting<string>(
 		"extensionOutputFolder",
 	);
+
 	if (extensionOutputFolder) {
 		extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
 	} else {
@@ -435,6 +449,7 @@ export async function readExtensionOutputFolder(): Promise<void> {
 						extensionOutputFolder,
 					),
 				);
+
 				return;
 			}
 		}
@@ -466,10 +481,12 @@ export function setExtensionLog(path: string): void {
 // are going to be appended to this file.
 export async function readExtensionLog(): Promise<void> {
 	extensionLog = await util.getExpandedSetting<string>("extensionLog");
+
 	if (extensionLog) {
 		// If there is a directory defined within the extension log path,
 		// honor it and don't append to extensionOutputFolder.
 		let parsePath: path.ParsedPath = path.parse(extensionLog);
+
 		if (extensionOutputFolder && !parsePath.dir) {
 			extensionLog = path.join(extensionOutputFolder, extensionLog);
 		} else {
@@ -523,6 +540,7 @@ export function setPostConfigureArgs(args: string[]): void {
 export async function readPreConfigureScript(): Promise<void> {
 	preConfigureScript =
 		await util.getExpandedSetting<string>("preConfigureScript");
+
 	if (preConfigureScript) {
 		preConfigureScript = util.resolvePathToRoot(preConfigureScript);
 		logger.message(
@@ -532,6 +550,7 @@ export async function readPreConfigureScript(): Promise<void> {
 				preConfigureScript,
 			),
 		);
+
 		if (!util.checkFileExistsSync(preConfigureScript)) {
 			logger.message(
 				localize(
@@ -546,6 +565,7 @@ export async function readPreConfigureScript(): Promise<void> {
 export async function readPreConfigureArgs(): Promise<void> {
 	preConfigureArgs =
 		(await util.getExpandedSetting<string[]>("preConfigureArgs")) ?? [];
+
 	if (preConfigureArgs && preConfigureArgs.length > 0) {
 		logger.message(
 			localize(
@@ -561,6 +581,7 @@ export async function readPostConfigureScript(): Promise<void> {
 	postConfigureScript = await util.getExpandedSetting<string>(
 		"postConfigureScript",
 	);
+
 	if (postConfigureScript) {
 		postConfigureScript = util.resolvePathToRoot(postConfigureScript);
 		logger.message(
@@ -570,6 +591,7 @@ export async function readPostConfigureScript(): Promise<void> {
 				postConfigureScript,
 			),
 		);
+
 		if (!util.checkFileExistsSync(postConfigureScript)) {
 			logger.message(
 				localize(
@@ -584,6 +606,7 @@ export async function readPostConfigureScript(): Promise<void> {
 export async function readPostConfigureArgs(): Promise<void> {
 	postConfigureArgs =
 		(await util.getExpandedSetting<string[]>("postConfigureArgs")) ?? [];
+
 	if (postConfigureArgs && postConfigureArgs.length > 0) {
 		logger.message(
 			localize(
@@ -654,6 +677,7 @@ export async function readConfigurationCachePath(): Promise<void> {
 	configurationCachePath = await util.getExpandedSetting<string>(
 		"configurationCachePath",
 	);
+
 	if (!configurationCachePath && extensionOutputFolder) {
 		configurationCachePath = path.join(
 			extensionOutputFolder,
@@ -665,6 +689,7 @@ export async function readConfigurationCachePath(): Promise<void> {
 		// If there is a directory defined within the configuration cache path,
 		// honor it and don't append to extensionOutputFolder.
 		let parsePath: path.ParsedPath = path.parse(configurationCachePath);
+
 		if (extensionOutputFolder && !parsePath.dir) {
 			configurationCachePath = path.join(
 				extensionOutputFolder,
@@ -699,6 +724,7 @@ export async function readCompileCommandsPath(): Promise<void> {
 	compileCommandsPath = await util.getExpandedSetting<string>(
 		"compileCommandsPath",
 	);
+
 	if (compileCommandsPath) {
 		compileCommandsPath = util.resolvePathToRoot(compileCommandsPath);
 	}
@@ -723,6 +749,7 @@ export async function readAdditionalCompilerNames(): Promise<void> {
 	additionalCompilerNames = await util.getExpandedSetting<string[]>(
 		"additionalCompilerNames",
 	);
+
 	if (additionalCompilerNames && additionalCompilerNames.length > 0) {
 		logger.message(
 			localize(
@@ -745,6 +772,7 @@ export async function readExcludeCompilerNames(): Promise<void> {
 	excludeCompilerNames = await util.getExpandedSetting<string[]>(
 		"excludeCompilerNames",
 	);
+
 	if (excludeCompilerNames && excludeCompilerNames.length > 0) {
 		logger.message(
 			localize(
@@ -774,6 +802,7 @@ export function setDryrunSwitches(switches: string[]): void {
 // even if this results in not ideal behavior: less information available to be parsed, which leads to incomplete IntelliSense or missing targets.
 export async function readDryrunSwitches(): Promise<void> {
 	dryrunSwitches = await util.getExpandedSetting<string[]>("dryrunSwitches");
+
 	if (dryrunSwitches && dryrunSwitches.length > 0) {
 		logger.message(
 			localize(
@@ -840,7 +869,9 @@ export function launchConfigurationToString(
 		configuration.binaryPath,
 		configuration.cwd,
 	);
+
 	let binArgs: string = configuration.binaryArgs.join(",");
+
 	return `${configuration.cwd}>${binPath}(${binArgs})`;
 }
 
@@ -851,10 +882,12 @@ export async function stringToLaunchConfiguration(
 	str: string,
 ): Promise<LaunchConfiguration | undefined> {
 	let regexp: RegExp = /(.*)\>(.*)\((.*)\)/gm;
+
 	let match: RegExpExecArray | null = regexp.exec(str);
 
 	if (match) {
 		let fullPath: string = await util.makeFullPath(match[2], match[1]);
+
 		let splitArgs: string[] = match[3] === "" ? [] : match[3].split(",");
 
 		return {
@@ -877,6 +910,7 @@ export async function setCurrentLaunchConfiguration(
 	configuration: LaunchConfiguration | undefined,
 ): Promise<void> {
 	currentLaunchConfiguration = configuration;
+
 	let launchConfigStr: string = currentLaunchConfiguration
 		? launchConfigurationToString(currentLaunchConfiguration)
 		: "";
@@ -898,8 +932,10 @@ function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
 // Also update the status bar item.
 async function readCurrentLaunchConfiguration(): Promise<void> {
 	await readLaunchConfigurations();
+
 	let currentLaunchConfigurationName: string | undefined =
 		extension.getState().launchConfiguration;
+
 	if (currentLaunchConfigurationName) {
 		currentLaunchConfiguration = getLaunchConfiguration(
 			currentLaunchConfigurationName,
@@ -907,6 +943,7 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
 	}
 
 	let launchConfigStr: string = "No launch configuration set.";
+
 	if (currentLaunchConfiguration) {
 		launchConfigStr = launchConfigurationToString(
 			currentLaunchConfiguration,
@@ -1054,8 +1091,11 @@ export function setConfigurationPostConfigureArgs(args: string[]): void {
 async function analyzeConfigureParams(): Promise<void> {
 	getBuildLogForConfiguration(currentMakefileConfiguration);
 	await getCommandForConfiguration(currentMakefileConfiguration);
+
 	getProblemMatchersForConfiguration(currentMakefileConfiguration);
+
 	getPreConfigureArgsForConfiguration(currentMakefileConfiguration);
+
 	getPostConfigureArgsForConfiguration(currentMakefileConfiguration);
 }
 
@@ -1081,6 +1121,7 @@ export async function getCommandForConfiguration(
 	let makeParsedPathSettings: path.ParsedPath | undefined = makePath
 		? path.parse(makePath)
 		: undefined;
+
 	let makeParsedPathConfigurations: path.ParsedPath | undefined =
 		makefileConfiguration?.makePath
 			? path.parse(makefileConfiguration?.makePath)
@@ -1094,6 +1135,7 @@ export async function getCommandForConfiguration(
 		makeParsedPathConfigurations?.base ||
 		makeParsedPathSettings?.base ||
 		"make";
+
 	let configurationMakeCommandExtension: string | undefined =
 		makeParsedPathConfigurations?.ext || makeParsedPathSettings?.ext;
 
@@ -1123,6 +1165,7 @@ export async function getCommandForConfiguration(
 	configurationMakefile = makefileConfiguration?.makefilePath
 		? util.resolvePathToRoot(makefileConfiguration?.makefilePath)
 		: makefilePath;
+
 	if (configurationMakefile) {
 		// check if the makefile path is a directory. If so, try adding `Makefile` or `makefile`
 		if (util.checkDirectoryExistsSync(configurationMakefile)) {
@@ -1130,6 +1173,7 @@ export async function getCommandForConfiguration(
 				configurationMakefile,
 				"Makefile",
 			);
+
 			if (!util.checkFileExistsSync(makeFileTest)) {
 				makeFileTest = path.join(configurationMakefile, "makefile");
 			}
@@ -1154,6 +1198,7 @@ export async function getCommandForConfiguration(
 		makefileConfiguration?.makeDirectory
 			? util.resolvePathToRoot(makefileConfiguration?.makeDirectory)
 			: makeDirectory;
+
 	if (makeDirectoryUsed) {
 		configurationMakeArgs.push("-C");
 		configurationMakeArgs.push(`${makeDirectoryUsed}`);
@@ -1168,6 +1213,7 @@ export async function getCommandForConfiguration(
 				configurationMakeArgs.push(util.resolvePathToRoot(arg));
 			} else if (arg.startsWith("--directory")) {
 				const eqIdx: number = arg.indexOf("=");
+
 				const folderStr: string = arg.substring(eqIdx + 1, arg.length);
 				configurationMakeArgs.push(
 					`--directory=${util.resolvePathToRoot(folderStr)}`,
@@ -1198,6 +1244,7 @@ export async function getCommandForConfiguration(
 			configurationMakefile = util.resolvePathToRoot(
 				path.join(makeDirectoryUsed, "Makefile"),
 			);
+
 			if (!util.checkFileExistsSync(configurationMakefile)) {
 				configurationMakefile = util.resolvePathToRoot(
 					path.join(makeDirectoryUsed, "makefile"),
@@ -1205,6 +1252,7 @@ export async function getCommandForConfiguration(
 			}
 		} else {
 			configurationMakefile = util.resolvePathToRoot("./Makefile");
+
 			if (!util.checkFileExistsSync(configurationMakefile)) {
 				configurationMakefile = util.resolvePathToRoot("./makefile");
 			}
@@ -1214,9 +1262,11 @@ export async function getCommandForConfiguration(
 	// Validation and warnings about properly defining the makefile and make tool.
 	// These are not needed if the current configuration reads from a build log instead of dry-run output.
 	let buildLog: string | undefined = getConfigurationBuildLog();
+
 	let buildLogContent: string | undefined = buildLog
 		? util.readFile(buildLog)
 		: undefined;
+
 	if (!buildLogContent) {
 		if (
 			(!makeParsedPathSettings || makeParsedPathSettings.name === "") &&
@@ -1252,8 +1302,10 @@ export async function getCommandForConfiguration(
 			const makeBaseName: string = path.parse(
 				configurationMakeCommand,
 			).base;
+
 			const makePathInEnv: string | undefined =
 				util.toolPathInEnv(makeBaseName);
+
 			if (!makePathInEnv) {
 				logger.message(
 					localize(
@@ -1373,6 +1425,7 @@ export function getPreConfigureArgsForConfiguration(
 ): void {
 	let makefileConfiguration: MakefileConfiguration | undefined =
 		getMakefileConfiguration(configuration);
+
 	const localPreConfigArgs = makefileConfiguration?.preConfigureArgs;
 
 	if (localPreConfigArgs) {
@@ -1387,6 +1440,7 @@ export function getPostConfigureArgsForConfiguration(
 ): void {
 	let makefileConfiguration: MakefileConfiguration | undefined =
 		getMakefileConfiguration(configuration);
+
 	const localPostConfigArgs = makefileConfiguration?.postConfigureArgs;
 
 	if (localPostConfigArgs) {
@@ -1415,7 +1469,9 @@ export async function readMakefileConfigurations(): Promise<void> {
 	makefileConfigurations =
 		workspaceConfiguration.get<MakefileConfiguration[]>("configurations") ||
 		[];
+
 	let detectedUnnamedConfigurations: boolean = false;
+
 	let unnamedConfigurationId: number = 0;
 
 	// Collect unnamed configurations (probably) defined by the extension earlier,
@@ -1437,7 +1493,9 @@ export async function readMakefileConfigurations(): Promise<void> {
 			// defined with IDs other than the rule we assume (like not consecutive numbers, but not only).
 			// This may happen when the user deletes configurations at some point without updating the IDs.
 			unnamedConfigurationId++;
+
 			let autoGeneratedName: string = `Unnamed configuration ${unnamedConfigurationId}`;
+
 			while (unnamedConfigurationNames.includes(autoGeneratedName)) {
 				unnamedConfigurationId++;
 				autoGeneratedName = `Unnamed configuration ${unnamedConfigurationId}`;
@@ -1480,6 +1538,7 @@ export async function readMakefileConfigurations(): Promise<void> {
 			return k.name;
 		},
 	);
+
 	if (makefileConfigurationNames.length > 0) {
 		logger.message(
 			localize(
@@ -1524,6 +1583,7 @@ export function setCurrentTarget(target: string | undefined): void {
 // Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
 	let buildTarget: string | undefined = extension.getState().buildTarget;
+
 	if (!buildTarget) {
 		logger.message(
 			localize(
@@ -1738,6 +1798,7 @@ export async function initFromSettings(
 	// while reading the settings is done at activation time  and also anytime later,
 	// after changing a makefile configuration, a build or a launch target.
 	let extensionLog: string | undefined = getExtensionLog();
+
 	if (extensionLog && activation && util.checkFileExistsSync(extensionLog)) {
 		util.deleteFileSync(extensionLog);
 	}
@@ -1793,6 +1854,7 @@ export async function initFromSettings(
 	// The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
 	vscode.window.onDidChangeActiveTextEditor(async (e) => {
 		let language: string = "";
+
 		if (e) {
 			language = e.document.languageId;
 		}
@@ -1866,12 +1928,16 @@ export async function initFromSettings(
 			// A subset of these should also trigger an IntelliSense config provider update.
 			// Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
 			let telemetryProperties: telemetry.Properties | null = {};
+
 			let updatedSettingsSubkeys: string[] = [];
+
 			const keyRoot: string = "makefile";
+
 			let subKey: string = "launchConfigurations";
 
 			let updatedLaunchConfigurations: LaunchConfiguration[] | undefined =
 				await util.getExpandedSetting<LaunchConfiguration[]>(subKey);
+
 			if (
 				!util.areEqual(
 					updatedLaunchConfigurations,
@@ -1886,12 +1952,14 @@ export async function initFromSettings(
 			}
 
 			subKey = "defaultLaunchConfiguration";
+
 			let updatedDefaultLaunchConfiguration:
 				| DefaultLaunchConfiguration
 				| undefined =
 				await util.getExpandedSetting<DefaultLaunchConfiguration>(
 					subKey,
 				);
+
 			if (
 				!util.areEqual(
 					updatedDefaultLaunchConfiguration,
@@ -1905,16 +1973,20 @@ export async function initFromSettings(
 			}
 
 			subKey = "loggingLevel";
+
 			let updatedLoggingLevel: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedLoggingLevel !== loggingLevel) {
 				await readLoggingLevel();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "buildLog";
+
 			let updatedBuildLog: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedBuildLog) {
 				updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
 			}
@@ -1939,12 +2011,15 @@ export async function initFromSettings(
 			}
 
 			subKey = "extensionOutputFolder";
+
 			let updatedExtensionOutputFolder: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedExtensionOutputFolder) {
 				updatedExtensionOutputFolder = util.resolvePathToRoot(
 					updatedExtensionOutputFolder,
 				);
+
 				if (
 					!util.checkDirectoryExistsSync(
 						updatedExtensionOutputFolder,
@@ -1963,13 +2038,16 @@ export async function initFromSettings(
 			}
 
 			subKey = "extensionLog";
+
 			let updatedExtensionLog: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedExtensionLog) {
 				// If there is a directory defined within the extension log path,
 				// honor it and don't append to extensionOutputFolder.
 				let parsePath: path.ParsedPath =
 					path.parse(updatedExtensionLog);
+
 				if (extensionOutputFolder && !parsePath.dir) {
 					updatedExtensionLog = path.join(
 						extensionOutputFolder,
@@ -1987,8 +2065,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "preConfigureScript";
+
 			let updatedPreConfigureScript: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedPreConfigureScript) {
 				updatedPreConfigureScript = util.resolvePathToRoot(
 					updatedPreConfigureScript,
@@ -2001,8 +2081,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "preConfigureArgs";
+
 			let updatedPreConfigureArgs: string[] | undefined =
 				await util.getExpandedSetting<string[]>(subKey);
+
 			if (
 				updatedPreConfigureArgs &&
 				!util.areEqual(updatedPreConfigureArgs, preConfigureArgs)
@@ -2012,8 +2094,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "postConfigureScript";
+
 			let updatedPostConfigureScript: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedPostConfigureScript) {
 				updatedPostConfigureScript = util.resolvePathToRoot(
 					updatedPostConfigureScript,
@@ -2025,8 +2109,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "postConfigureArgs";
+
 			let updatedPostConfigureArgs: string[] | undefined =
 				await util.getExpandedSetting<string[]>(subKey);
+
 			if (
 				updatedPostConfigureArgs &&
 				!util.areEqual(updatedPostConfigureArgs, postConfigureArgs)
@@ -2036,8 +2122,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "alwaysPreConfigure";
+
 			let updatedAlwaysPreConfigure: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedAlwaysPreConfigure !== alwaysPreConfigure) {
 				// No IntelliSense update needed.
 				await readAlwaysPreConfigure();
@@ -2045,16 +2133,20 @@ export async function initFromSettings(
 			}
 
 			subKey = "alwaysPostConfigure";
+
 			let updatedAlwaysPostConfigure: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedAlwaysPostConfigure !== alwaysPostConfigure) {
 				await readAlwaysPostConfigure();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "configurationCachePath";
+
 			let oldConfigurationCachePath = configurationCachePath;
 			await readConfigurationCachePath();
+
 			if (oldConfigurationCachePath !== configurationCachePath) {
 				// A change in makefile.configurationCachePath should trigger an IntelliSense update
 				// only if the extension is not currently reading from a build log.
@@ -2066,8 +2158,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "makePath";
+
 			let updatedMakePath: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedMakePath !== makePath) {
 				// Not very likely, but it is safe to consider that a different make tool
 				// may produce a different dry-run output with potential impact on IntelliSense,
@@ -2081,8 +2175,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "makefilePath";
+
 			let updatedMakefilePath: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedMakefilePath) {
 				updatedMakefilePath =
 					util.resolvePathToRoot(updatedMakefilePath);
@@ -2099,8 +2195,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "makeDirectory";
+
 			let updatedMakeDirectory: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedMakeDirectory) {
 				updatedMakeDirectory =
 					util.resolvePathToRoot(updatedMakeDirectory);
@@ -2117,10 +2215,12 @@ export async function initFromSettings(
 			}
 
 			subKey = "configurations";
+
 			let updatedMakefileConfigurations:
 				| MakefileConfiguration[]
 				| undefined =
 				await util.getExpandedSetting<MakefileConfiguration[]>(subKey);
+
 			if (
 				!util.areEqual(
 					updatedMakefileConfigurations,
@@ -2135,8 +2235,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "dryrunSwitches";
+
 			let updatedDryrunSwitches: string[] | undefined =
 				await util.getExpandedSetting<string[]>(subKey);
+
 			if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
 				// A change in makefile.dryrunSwitches should trigger an IntelliSense update
 				// only if the extension is not currently reading from a build log.
@@ -2149,8 +2251,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "additionalCompilerNames";
+
 			let updatedAdditionalCompilerNames: string[] | undefined =
 				await util.getExpandedSetting<string[]>(subKey);
+
 			if (
 				!util.areEqual(
 					updatedAdditionalCompilerNames,
@@ -2162,8 +2266,10 @@ export async function initFromSettings(
 			}
 
 			subKey = "excludeCompilerNames";
+
 			let updatedExcludeCompilerNames: string[] | undefined =
 				await util.getExpandedSetting<string[]>(subKey);
+
 			if (
 				!util.areEqual(
 					updatedExcludeCompilerNames,
@@ -2175,40 +2281,50 @@ export async function initFromSettings(
 			}
 
 			subKey = "configureOnOpen";
+
 			let updatedConfigureOnOpen: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedConfigureOnOpen !== configureOnOpen) {
 				await readConfigureOnOpen();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "configureOnEdit";
+
 			let updatedConfigureOnEdit: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedConfigureOnEdit !== configureOnEdit) {
 				await readConfigureOnEdit();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "configureAfterCommand";
+
 			let updatedConfigureAfterCommand: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedConfigureAfterCommand !== configureAfterCommand) {
 				await readConfigureAfterCommand();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "phonyOnlyTargets";
+
 			let updatedPhonyOnlyTargets: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedPhonyOnlyTargets !== phonyOnlyTargets) {
 				await readPhonyOnlyTargets();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "saveBeforeBuildOrConfigure";
+
 			let updatedSaveBeforeBuildOrConfigure: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (
 				updatedSaveBeforeBuildOrConfigure !== saveBeforeBuildOrConfigure
 			) {
@@ -2217,32 +2333,40 @@ export async function initFromSettings(
 			}
 
 			subKey = "buildBeforeLaunch";
+
 			let updatedBuildBeforeLaunch: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedBuildBeforeLaunch !== buildBeforeLaunch) {
 				await readBuildBeforeLaunch();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "clearOutputBeforeBuild";
+
 			let updatedClearOutputBeforeBuild: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedClearOutputBeforeBuild !== clearOutputBeforeBuild) {
 				await readClearOutputBeforeBuild();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "ignoreDirectoryCommands";
+
 			let updatedIgnoreDirectoryCommands: boolean | undefined =
 				await util.getExpandedSetting<boolean>(subKey);
+
 			if (updatedIgnoreDirectoryCommands !== ignoreDirectoryCommands) {
 				await readIgnoreDirectoryCommands();
 				updatedSettingsSubkeys.push(subKey);
 			}
 
 			subKey = "compileCommandsPath";
+
 			let updatedCompileCommandsPath: string | undefined =
 				await util.getExpandedSetting<string>(subKey);
+
 			if (updatedCompileCommandsPath) {
 				updatedCompileCommandsPath = util.resolvePathToRoot(
 					updatedCompileCommandsPath,
@@ -2254,18 +2378,23 @@ export async function initFromSettings(
 			}
 
 			subKey = "panel.visibility";
+
 			let wasLocalDebugEnabled: boolean =
 				isOptionalFeatureEnabled("debug");
+
 			let wasLocalRunningEnabled: boolean =
 				isOptionalFeatureEnabled("run");
 			await readFeaturesVisibility();
+
 			if (vscode.workspace.isTrusted) {
 				enableOptionallyVisibleCommands();
 			}
 			let isLocalDebugEnabled: boolean =
 				isOptionalFeatureEnabled("debug");
+
 			let isLocalRunningEnabled: boolean =
 				isOptionalFeatureEnabled("run");
+
 			if (
 				wasLocalDebugEnabled !== isLocalDebugEnabled ||
 				wasLocalRunningEnabled !== isLocalRunningEnabled
@@ -2301,15 +2430,19 @@ export async function initFromSettings(
 					),
 					"Verbose",
 				);
+
 				try {
 					// For settings that use "." in their name, make sure we send the right object
 					// to the telemetry function. Currently, the schema for such a setting
 					// is represented differently than the workspace setting value.
 					let settingObj: any;
+
 					let workspaceConfiguration: vscode.WorkspaceConfiguration =
 						vscode.workspace.getConfiguration(keyRoot);
+
 					if (subKey.includes(".")) {
 						const subKeys: string[] = subKey.split(".");
+
 						settingObj = workspaceConfiguration;
 						subKeys.forEach((key) => {
 							settingObj = settingObj[key];
@@ -2421,8 +2554,11 @@ export async function setNewConfiguration(): Promise<void> {
 		// Because of this, the event name is still "settingsChanged", even if
 		// we're doing a state change now.
 		let keyRoot: string = "makefile";
+
 		let subKey: string = "configurations";
+
 		let key: string = keyRoot + "." + subKey;
+
 		let workspaceConfiguration: vscode.WorkspaceConfiguration =
 			vscode.workspace.getConfiguration(keyRoot);
 		telemetryProperties = {};
@@ -2431,6 +2567,7 @@ export async function setNewConfiguration(): Promise<void> {
 		// if the extension changes state for launch configuration,
 		// but guard just in case.
 		let makefileonfigurationSetting: any = workspaceConfiguration[subKey];
+
 		if (makefileonfigurationSetting) {
 			try {
 				telemetryProperties = await telemetry.analyzeSettings(
@@ -2457,6 +2594,7 @@ export async function setNewConfiguration(): Promise<void> {
 
 export async function setTargetByName(targetName: string): Promise<void> {
 	currentTarget = targetName;
+
 	let displayTarget: string = targetName ? currentTarget : "Default";
 	statusBar.setTarget(displayTarget);
 	logger.message(
@@ -2497,10 +2635,12 @@ export async function selectTarget(): Promise<void> {
 				"The project needs a configure to populate the build targets correctly.",
 			),
 		);
+
 		if (configureAfterCommand) {
 			let retc: number = await make.configure(
 				make.TriggeredBy.configureBeforeTargetChange,
 			);
+
 			if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
 				logger.message(
 					localize(
@@ -2571,15 +2711,18 @@ export async function setLaunchConfigurationByName(
 	currentLaunchConfiguration = getLaunchConfiguration(
 		launchConfigurationName,
 	);
+
 	if (!currentLaunchConfiguration) {
 		currentLaunchConfiguration = await stringToLaunchConfiguration(
 			launchConfigurationName,
 		);
+
 		if (currentLaunchConfiguration) {
 			// Read again all launch configurations from settings, so that we push this incoming into that array as well
 			// because we want to persist the original unexpanded content of launch configurations.
 			let workspaceConfiguration: vscode.WorkspaceConfiguration =
 				vscode.workspace.getConfiguration("makefile");
+
 			let launchConfigAsInSettings: LaunchConfiguration[] =
 				workspaceConfiguration.get<LaunchConfiguration[]>(
 					"launchConfigurations",
@@ -2668,10 +2811,12 @@ export async function selectLaunchConfiguration(): Promise<void> {
 				"The project needs a configure to populate the launch targets correctly.",
 			),
 		);
+
 		if (configureAfterCommand) {
 			let retc: number = await make.configure(
 				make.TriggeredBy.configureBeforeLaunchTargetChange,
 			);
+
 			if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
 				logger.message(
 					localize(
@@ -2697,7 +2842,9 @@ export async function selectLaunchConfiguration(): Promise<void> {
 		}
 	});
 	launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
+
 	let options: vscode.QuickPickOptions = {};
+
 	if (launchTargets.length === 0) {
 		options.placeHolder = "No launch targets identified";
 	}
@@ -2709,6 +2856,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
 	if (chosen) {
 		let currentLaunchConfiguration: LaunchConfiguration | undefined =
 			getCurrentLaunchConfiguration();
+
 		if (
 			!currentLaunchConfiguration ||
 			chosen !== launchConfigurationToString(currentLaunchConfiguration)
@@ -2726,8 +2874,11 @@ export async function selectLaunchConfiguration(): Promise<void> {
 			// Because of this, the event name is still "settingsChanged", even if
 			// we're doing a state change now.
 			let keyRoot: string = "makefile";
+
 			let subKey: string = "launchConfigurations";
+
 			let key: string = keyRoot + "." + subKey;
+
 			let workspaceConfiguration: vscode.WorkspaceConfiguration =
 				vscode.workspace.getConfiguration(keyRoot);
 			telemetryProperties = {};
@@ -2737,6 +2888,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
 			// but guard just in case.
 			let launchConfigurationSetting: any =
 				workspaceConfiguration[subKey];
+
 			if (launchConfigurationSetting) {
 				try {
 					telemetryProperties = await telemetry.analyzeSettings(

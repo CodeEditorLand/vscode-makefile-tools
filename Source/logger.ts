@@ -56,6 +56,7 @@ export function message(message: string, loggingLevel?: string): void {
 	channel.appendLine(message);
 
 	let extensionLog: string | undefined = configuration.getExtensionLog();
+
 	if (extensionLog) {
 		fs.appendFileSync(extensionLog, message);
 		fs.appendFileSync(extensionLog, "\n");
@@ -75,6 +76,7 @@ export function messageNoCR(message: string, loggingLevel?: string): void {
 	channel.append(message);
 
 	let extensionLog: string | undefined = configuration.getExtensionLog();
+
 	if (extensionLog) {
 		fs.appendFileSync(extensionLog, message);
 	}

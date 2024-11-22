@@ -18,6 +18,7 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export enum LaunchStatuses {
@@ -36,6 +37,7 @@ export class Launcher implements vscode.Disposable {
 	public getLaunchTargetPath(): string {
 		let launchConfiguration: configuration.LaunchConfiguration | undefined =
 			configuration.getCurrentLaunchConfiguration();
+
 		if (launchConfiguration) {
 			return launchConfiguration.binaryPath;
 		} else {
@@ -62,6 +64,7 @@ export class Launcher implements vscode.Disposable {
 	public getLaunchTargetDirectory(): string {
 		let launchConfiguration: configuration.LaunchConfiguration | undefined =
 			configuration.getCurrentLaunchConfiguration();
+
 		if (launchConfiguration) {
 			return launchConfiguration.cwd;
 		} else {
@@ -74,6 +77,7 @@ export class Launcher implements vscode.Disposable {
 	public getLaunchTargetFileName(): string {
 		let launchConfiguration: configuration.LaunchConfiguration | undefined =
 			configuration.getCurrentLaunchConfiguration();
+
 		if (launchConfiguration) {
 			return path.parse(launchConfiguration.binaryPath).name;
 		} else {
@@ -101,6 +105,7 @@ export class Launcher implements vscode.Disposable {
 	public getLaunchTargetArgs(): string[] {
 		let launchConfiguration: configuration.LaunchConfiguration | undefined =
 			configuration.getCurrentLaunchConfiguration();
+
 		if (launchConfiguration) {
 			return launchConfiguration.binaryArgs;
 		} else {
@@ -151,19 +156,25 @@ export class Launcher implements vscode.Disposable {
 
 		let compilerPath: string | undefined =
 			extension.extension.getCompilerFullPath();
+
 		let parsedObjPath: path.ParsedPath | undefined = compilerPath
 			? path.parse(compilerPath)
 			: undefined;
+
 		let isClangCompiler: boolean | undefined =
 			parsedObjPath?.name.startsWith("clang");
+
 		let isMsvcCompiler: boolean | undefined =
 			!isClangCompiler && parsedObjPath?.name.startsWith("cl");
+
 		let dbg: string = isMsvcCompiler ? "cppvsdbg" : "cppdbg";
 
 		// Initial debugger guess
 		let guessMiDebuggerPath: string | undefined =
 			!isMsvcCompiler && parsedObjPath ? parsedObjPath.dir : undefined;
+
 		let guessMiMode: string | undefined;
+
 		if (parsedObjPath?.name.startsWith("clang")) {
 			guessMiMode = "lldb";
 		} else if (!parsedObjPath?.name.startsWith("cl")) {
@@ -178,6 +189,7 @@ export class Launcher implements vscode.Disposable {
 			)
 				? guessMiDebuggerPath
 				: path.join(guessMiDebuggerPath, guessMiMode);
+
 			if (process.platform === "win32") {
 				// On mingw a file is not found if the extension is not part of the path
 				debuggerPath = debuggerPath + ".exe";
@@ -193,10 +205,12 @@ export class Launcher implements vscode.Disposable {
 		let defaultLaunchConfiguration:
 			| configuration.DefaultLaunchConfiguration
 			| undefined = configuration.getDefaultLaunchConfiguration();
+
 		let miMode: string | undefined =
 			currentLaunchConfiguration.MIMode ||
 			defaultLaunchConfiguration?.MIMode ||
 			guessMiMode;
+
 		let miDebuggerPath: string | undefined =
 			currentLaunchConfiguration.miDebuggerPath ||
 			defaultLaunchConfiguration?.miDebuggerPath ||
@@ -222,6 +236,7 @@ export class Launcher implements vscode.Disposable {
 			miDebuggerPath = util.checkFileExistsSync(miDebuggerPath)
 				? miDebuggerPath
 				: path.join(miDebuggerPath, miMode);
+
 			if (process.platform === "win32") {
 				miDebuggerPath = miDebuggerPath + ".exe";
 			}
@@ -289,12 +304,14 @@ export class Launcher implements vscode.Disposable {
 					currentBuildTarget,
 				),
 			);
+
 			let buildSuccess: boolean =
 				(await make.buildTarget(
 					make.TriggeredBy.buildTarget,
 					currentBuildTarget,
 					false,
 				)) === make.ConfigureBuildReturnCodeTypes.success;
+
 			if (!buildSuccess) {
 				logger.message(
 					localize(
@@ -303,12 +320,16 @@ export class Launcher implements vscode.Disposable {
 						currentBuildTarget,
 					),
 				);
+
 				let noButton: string = localize("no", "No");
+
 				let yesButton: string = localize("yes", "Yes");
+
 				const message: string = localize(
 					"build.failed.continue.anyway",
 					"Build failed. Do you want to continue anyway?",
 				);
+
 				const chosen: vscode.MessageItem | undefined =
 					await vscode.window.showErrorMessage<vscode.MessageItem>(
 						message,
@@ -331,6 +352,7 @@ export class Launcher implements vscode.Disposable {
 		let currentLaunchConfiguration:
 			| configuration.LaunchConfiguration
 			| undefined = configuration.getCurrentLaunchConfiguration();
+
 		if (!currentLaunchConfiguration) {
 			// If no launch configuration is set, give the user a chance to select one now from the quick pick
 			// (unless we know it's going to be empty).
@@ -342,6 +364,7 @@ export class Launcher implements vscode.Disposable {
 						op,
 					),
 				);
+
 				return LaunchStatuses.launchTargetsListEmpty;
 			} else {
 				vscode.window.showErrorMessage(
@@ -357,6 +380,7 @@ export class Launcher implements vscode.Disposable {
 				// (the user cancelled the quick pick or the parser found zero launch targets) message and fail.
 				currentLaunchConfiguration =
 					configuration.getCurrentLaunchConfiguration();
+
 				if (!currentLaunchConfiguration) {
 					vscode.window.showErrorMessage(
 						localize(
@@ -365,6 +389,7 @@ export class Launcher implements vscode.Disposable {
 							op,
 						),
 					);
+
 					return LaunchStatuses.noLaunchConfigurationSet;
 				}
 			}
@@ -379,9 +404,11 @@ export class Launcher implements vscode.Disposable {
 		let status: string = await this.validateLaunchConfiguration(
 			make.Operations.debug,
 		);
+
 		let currentLaunchConfiguration:
 			| configuration.LaunchConfiguration
 			| undefined;
+
 		if (status === LaunchStatuses.success) {
 			currentLaunchConfiguration =
 				configuration.getCurrentLaunchConfiguration();
@@ -390,7 +417,9 @@ export class Launcher implements vscode.Disposable {
 		if (currentLaunchConfiguration) {
 			let debugConfig: vscode.DebugConfiguration =
 				this.prepareDebugCurrentTarget(currentLaunchConfiguration);
+
 			let startFolder: vscode.WorkspaceFolder;
+
 			if (vscode.workspace.workspaceFolders) {
 				startFolder = vscode.workspace.workspaceFolders[0];
 				await vscode.debug.startDebugging(startFolder, debugConfig);
@@ -440,6 +469,7 @@ export class Launcher implements vscode.Disposable {
 			),
 			"Debug",
 		);
+
 		return terminalCommand;
 	}
 
@@ -465,12 +495,15 @@ export class Launcher implements vscode.Disposable {
 		let status: string = await this.validateLaunchConfiguration(
 			make.Operations.run,
 		);
+
 		let currentLaunchConfiguration:
 			| configuration.LaunchConfiguration
 			| undefined;
+
 		if (status === LaunchStatuses.success) {
 			currentLaunchConfiguration =
 				configuration.getCurrentLaunchConfiguration();
+
 			let terminalCommand: string = this.prepareRunCurrentTarget();
 			this.launchTerminal.sendText(terminalCommand);
 

@@ -59,6 +59,7 @@ export class StateManager {
 	// settings or makefiles edits)
 	get configureDirty(): boolean {
 		let dirty: boolean | undefined = this._get<boolean>("configureDirty");
+
 		if (dirty === undefined) {
 			dirty = true;
 		}

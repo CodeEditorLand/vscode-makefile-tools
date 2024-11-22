@@ -19,6 +19,7 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 // C/CPP standard versions
@@ -77,6 +78,7 @@ export function checkFileExistsSync(filePath: string): boolean {
 		// making file sysem stats fail. Safe to remove here.
 		let filePathUnq: string = filePath;
 		filePathUnq = removeQuotes(filePathUnq);
+
 		return fs.statSync(filePathUnq).isFile();
 	} catch (e) {}
 	return false;
@@ -92,6 +94,7 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
 export function createDirectorySync(directoryPath: string): boolean {
 	try {
 		fs.mkdirSync(directoryPath, { recursive: true });
+
 		return true;
 	} catch {}
 	return false;
@@ -130,6 +133,7 @@ export function tmpDir(): string {
 		return process.env["TEMP"] || "";
 	} else {
 		const xdg = process.env["XDG_RUNTIME_DIR"];
+
 		if (xdg) {
 			if (!fs.existsSync(xdg)) {
 				fs.mkdirSync(xdg);
@@ -144,6 +148,7 @@ export function tmpDir(): string {
 // and used to parse any additional compiler switches that need to be sent to CppTools.
 export function parseCompilerArgsScriptFile(): string {
 	const extensionPath = extension.extensionContext.extensionPath;
+
 	let scriptFile: string = path.join(
 		extensionPath,
 		"assets",
@@ -202,7 +207,9 @@ export function pathIsCurrentDirectory(pathStr: string): boolean {
 // to help when VSCode is not launched from the proper environment
 export function toolPathInEnv(name: string): string | undefined {
 	let envPath: string | undefined = process.env["PATH"];
+
 	let envPathSplit: string[] = [];
+
 	if (envPath) {
 		envPathSplit = envPath.split(path.delimiter);
 	}
@@ -212,6 +219,7 @@ export function toolPathInEnv(name: string): string | undefined {
 
 	return envPathSplit.find((p) => {
 		const fullPath: string = path.join(p, path.basename(name));
+
 		if (checkFileExistsSync(fullPath)) {
 			return fullPath;
 		}
@@ -251,6 +259,7 @@ export async function killTree(
 	}
 
 	let children: number[] = [];
+
 	let stdoutStr: string = "";
 
 	let stdout: any = (result: string): void => {
@@ -267,6 +276,7 @@ export async function killTree(
 			false,
 			stdout,
 		);
+
 		if (!!stdoutStr.length) {
 			children = stdoutStr
 				.split("\n")
@@ -279,6 +289,7 @@ export async function killTree(
 					stdoutStr,
 				),
 			);
+
 			for (const other of children) {
 				if (other) {
 					await killTree(progress, other);
@@ -287,6 +298,7 @@ export async function killTree(
 		}
 	} catch (e) {
 		logger.message(e.message);
+
 		throw e;
 	}
 
@@ -330,8 +342,10 @@ export function mergeEnvironment(
 				vars,
 			).reduce<EnvironmentVariables>((acc2, key: string) => {
 				acc2[normalizeEnvironmentVarname(key)] = vars[key];
+
 				return acc2;
 			}, {});
+
 			return { ...acc, ...norm_vars };
 		} else {
 			return { ...acc, ...vars };
@@ -366,6 +380,7 @@ export function spawnChildProcess(
 	const environment: EnvironmentVariables = forceEnglish
 		? localeOverride
 		: {};
+
 	const finalEnvironment: EnvironmentVariables = mergeEnvironment(
 		process.env as EnvironmentVariables,
 		environment,
@@ -377,12 +392,14 @@ export function spawnChildProcess(
 		// child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
 		// based on where it is running.
 		let shellType: string | undefined;
+
 		let shellPlatform: string =
 			process.platform === "win32"
 				? "windows"
 				: process.platform === "linux"
 					? "linux"
 					: "osx";
+
 		let workspaceConfiguration: vscode.WorkspaceConfiguration =
 			vscode.workspace.getConfiguration("terminal");
 		shellType =
@@ -401,6 +418,7 @@ export function spawnChildProcess(
 		let qProcessName: string = ensureQuoted
 			? quoteStringIfNeeded(processName)
 			: processName;
+
 		let qArgs: string[] = ensureQuoted
 			? args.map((arg) => {
 					return quoteStringIfNeeded(arg);
@@ -430,6 +448,7 @@ export function spawnChildProcess(
 				env: finalEnvironment,
 			},
 		);
+
 		if (child.pid) {
 			make.setCurPID(child.pid);
 		}
@@ -488,6 +507,7 @@ export async function cygpath(pathStr: string): Promise<string> {
 		false,
 		stdout,
 	);
+
 	return windowsPath;
 }
 
@@ -510,6 +530,7 @@ export async function ensureWindowsPath(path: string): Promise<string> {
 
 		// Mount drives names like "cygdrive" or "mnt" can be ignored.
 		const mountDrives: string[] = ["cygdrive", "mnt"];
+
 		for (const drv of mountDrives) {
 			if (winPath.startsWith(`/${drv}`)) {
 				winPath = winPath.substr(drv.length + 1);
@@ -523,6 +544,7 @@ export async function ensureWindowsPath(path: string): Promise<string> {
 
 		// Remove the slash and add the : for the drive.
 		winPath = winPath.substr(1);
+
 		const driveEndIndex: number = winPath.search("/");
 		winPath =
 			winPath.substring(0, driveEndIndex) +
@@ -604,6 +626,7 @@ export function removeQuotes(str: string): string {
 	for (const p in quotesStr) {
 		if (str.includes(quotesStr[p])) {
 			let regExpStr: string = `${quotesStr[p]}`;
+
 			let regExp: RegExp = RegExp(regExpStr, "g");
 			str = str.replace(regExp, "");
 		}
@@ -617,6 +640,7 @@ export function removeSplitUpParenthesis(strArray: string[]): string[] {
 
 	for (const str of strArray) {
 		let result: string = str.trim();
+
 		if (result.startsWith("(") && !result.endsWith(")")) {
 			result = result.substring(1, str.length - 1);
 		} else if (result.endsWith(")") && !result.startsWith("(")) {
@@ -631,9 +655,11 @@ export function removeSplitUpParenthesis(strArray: string[]): string[] {
 // Remove only the quotes (", ' or `) that are surrounding the given string.
 export function removeSurroundingQuotes(str: string): string {
 	let result: string = str.trim();
+
 	for (const p in quotesStr) {
 		if (result.startsWith(quotesStr[p]) && result.endsWith(quotesStr[p])) {
 			result = result.substring(1, str.length - 1);
+
 			return result;
 		}
 	}
@@ -664,6 +690,7 @@ export function quoteStringIfNeeded(str: string): string {
 const escapeChars: RegExp = /[\\\^\$\*\+\?\{\}\(\)\.\!\=\|\[\]\ \/]/; // characters that should be escaped.
 export function escapeString(str: string): string {
 	let escapedString: string = "";
+
 	for (const char of str) {
 		if (char.match(escapeChars)) {
 			escapedString += `\\${char}`;
@@ -706,6 +733,7 @@ export function areEqual(setting1: any, setting2: any): boolean {
 	}
 
 	let properties1: string[] = Object.getOwnPropertyNames(setting1);
+
 	let properties2: string[] = Object.getOwnPropertyNames(setting2);
 
 	if (properties1.length !== properties2.length) {
@@ -714,7 +742,9 @@ export function areEqual(setting1: any, setting2: any): boolean {
 
 	for (let p: number = 0; p < properties1.length; p++) {
 		let property: string = properties1[p];
+
 		let isEqual: boolean;
+
 		if (
 			typeof setting1[property] === "object" &&
 			typeof setting2[property] === "object"
@@ -739,6 +769,7 @@ export function hasProperties(obj: any): boolean {
 	}
 
 	let props: string[] = Object.getOwnPropertyNames(obj);
+
 	return props && props.length > 0;
 }
 
@@ -771,6 +802,7 @@ export function mergeProperties(dst: any, src: any): any {
 }
 export function removeDuplicates(src: string[]): string[] {
 	let seen: { [key: string]: boolean } = {};
+
 	let result: string[] = [];
 	src.forEach((item) => {
 		if (!seen[item]) {
@@ -846,6 +878,7 @@ export function userHome(): string {
 // Currently used during settings variable expansion.
 export function booleanify(value: string): boolean {
 	const truthy: string[] = ["true", "True", "1"];
+
 	return truthy.includes(value);
 }
 
@@ -859,6 +892,7 @@ export async function getExpandedSetting<T>(
 ): Promise<T | undefined> {
 	let workspaceConfiguration: vscode.WorkspaceConfiguration =
 		vscode.workspace.getConfiguration("makefile");
+
 	let settingVal: any | undefined = workspaceConfiguration.get<T>(settingId);
 
 	if (!propSchema) {
@@ -872,6 +906,7 @@ export async function getExpandedSetting<T>(
 	// Read what's at settingId in the workspace settings and for objects and arrays of complex types make sure
 	// to copy into a new counterpart that we will modify, because we don't want to persist expanded values in settings.
 	let copySettingVal: any | undefined;
+
 	if (propSchema && propSchema.type === "array") {
 		// A simple .concat() is not enough. We need to push(Object.assign) on all object entries in the array.
 		copySettingVal = [];
@@ -906,6 +941,7 @@ export async function getExpandedSettingVal<T>(
 	const typeJson: string | undefined = propSchema
 		? propSchema.type
 		: undefined;
+
 	if (
 		settingVal !== undefined &&
 		((propSchema && !areEqual(propSchema.default, settingVal)) ||
@@ -918,7 +954,9 @@ export async function getExpandedSettingVal<T>(
 				settingId,
 				settingVal,
 			);
+
 			let result: T = expandedVal as T;
+
 			if (typeJson === "boolean") {
 				result = booleanify(expandedVal) as T;
 			} else if (typeJson === "number" || typeJson === "integer") {
@@ -931,9 +969,12 @@ export async function getExpandedSettingVal<T>(
 			// example: array[5] is seen as property object with index array.5
 			// and at the next call we'll see the string.
 			let properties: string[] = Object.getOwnPropertyNames(settingVal);
+
 			for (let p: number = 0; p < properties.length; p++) {
 				let prop: string = properties[p];
+
 				let childPropSchema: any;
+
 				if (propSchema) {
 					if (typeJson === "array") {
 						childPropSchema = propSchema.items;
@@ -949,6 +990,7 @@ export async function getExpandedSettingVal<T>(
 					// but if that contained an array anywhere in its structure, if we don't copy here, this expansion will modify
 					// workspace settings which we want to leave untouched.
 					let copySettingValProp: any = settingVal[prop];
+
 					if (childPropSchema && childPropSchema.type === "array") {
 						copySettingValProp = [].concat(settingVal[prop]);
 					}
@@ -960,6 +1002,7 @@ export async function getExpandedSettingVal<T>(
 						copySettingValProp,
 						childPropSchema,
 					);
+
 					if (!areEqual(settingVal[prop], expandedProp)) {
 						settingVal[prop] = expandedProp;
 					}
@@ -1021,10 +1064,12 @@ export async function expandVariablesInSetting(
 	// Safe to replace \\${ with ESCAPED_VARIABLE_EXPANSION. This will cause the pattern to be skipped
 	// by the regular expression below and also we will replace in reverse at the end (without \\).
 	const telemetryProperties: telemetry.Properties = { setting: settingId };
+
 	let preprocStr: string = settingVal.replace(
 		/\\\$\{/gm,
 		"ESCAPED_VARIABLE_EXPANSION",
 	);
+
 	if (preprocStr !== settingVal) {
 		logger.message(
 			localize(
@@ -1036,18 +1081,24 @@ export async function expandVariablesInSetting(
 		);
 		telemetryProperties.pattern = "escaped";
 		telemetry.logEvent("varexp", telemetryProperties);
+
 		settingVal = preprocStr;
 	}
 
 	// Try the predefined VSCode variable first. The regexp for ${variable} won't fit the others because of the ":".
 	let expandedSetting: string = settingVal;
+
 	let regexpVSCodeVar: RegExp = /(\$\{(\w+)\})|(\$\{(\w+):(.+?)\})/gm;
+
 	let result: RegExpExecArray | null = regexpVSCodeVar.exec(expandedSetting);
+
 	while (result) {
 		const telemetryProperties: telemetry.Properties = {
 			setting: settingId,
 		};
+
 		let toStr: string = "";
+
 		if (result[2] === "workspaceFolder" || result[2] === "workspaceRoot") {
 			toStr = getWorkspaceRoot();
 			telemetryProperties.pattern = result[2];
@@ -1069,6 +1120,7 @@ export async function expandVariablesInSetting(
 		} else if (result[4] === "command") {
 			telemetryProperties.pattern = result[4];
 			telemetryProperties.info = result[5];
+
 			try {
 				toStr = await vscode.commands.executeCommand(result[5]);
 			} catch (e) {
@@ -1087,8 +1139,11 @@ export async function expandVariablesInSetting(
 			// and the setting follows the first dot.
 			telemetryProperties.pattern = result[4];
 			telemetryProperties.info = result[5];
+
 			const regexpCfg: RegExp = /(\w+)\.(.+)/gm;
+
 			const res: RegExpExecArray | null = regexpCfg.exec(result[5]);
+
 			if (res && res[1] && res[2]) {
 				let workspaceCfg: vscode.WorkspaceConfiguration =
 					vscode.workspace.getConfiguration(res[1]);
@@ -1171,6 +1226,7 @@ export async function expandVariablesInSetting(
 
 	// Reverse the preprocessing done at the beginning, except that we don't keep the escape character.
 	preprocStr = expandedSetting.replace(/ESCAPED_VARIABLE_EXPANSION/gm, "${");
+
 	return preprocStr;
 }
 
@@ -1185,6 +1241,7 @@ export async function expandVariablesInSetting(
 // and workspaceConfiguration.get<> will not see it as a whole.
 function getSettingMultipleDots(scope: any, settingId: string): any {
 	let result: any;
+
 	if (scope) {
 		let rootProps: string[] = Object.getOwnPropertyNames(scope);
 		rootProps = rootProps.filter(
@@ -1239,6 +1296,7 @@ export async function scheduleAsyncTask<T>(task: () => Promise<T>): Promise<T> {
 export function thisExtension(): vscode.Extension<any> {
 	const ext: vscode.Extension<any> | undefined =
 		vscode.extensions.getExtension("ms-vscode.makefile-tools");
+
 	if (!ext) {
 		throw new Error("Our own extension is null.");
 	}

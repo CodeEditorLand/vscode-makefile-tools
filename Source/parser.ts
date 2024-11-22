@@ -20,6 +20,7 @@ nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 // List of compiler tools plus the most common aliases cc and c++
@@ -46,6 +47,7 @@ const compilers: string[] = [
   "g\\+\\+",
   "c\\+\\+",
 ];
+
 const linkers: string[] = [
   "ccache",
   "ilink",
@@ -59,6 +61,7 @@ const linkers: string[] = [
   "g\\+\\+",
   "c\\+\\+",
 ];
+
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
@@ -92,6 +95,7 @@ export async function parseTargets(
     // succeeded by "#  Phony target (prerequisite of .PHONY).".
     let regexpTargetStr: string =
       "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S*[^:]):\\s+";
+
     if (configuration.getPhonyOnlyTargets()) {
       regexpTargetStr +=
         ".*\\s+(?=#  Phony target \\(prerequisite of \\.PHONY\\)\\.)";
@@ -500,6 +504,7 @@ async function parseAnySwitchFromToolArguments(
 
     // Marks the beginning of the next switch
     match2 = regexp.exec(args);
+
     if (match2) {
       index2 = regexp.lastIndex - match2[0].length;
     } else {
@@ -509,14 +514,17 @@ async function parseAnySwitchFromToolArguments(
     // The substring to analyze for the current switch.
     // It doesn't help to look beyond the next switch match.
     let partialArgs: string = args.substring(index1, index2);
+
     let swi: string = match1[3];
     swi = swi.trim();
 
     // Skip over any switches that we know we don't need
     let exclude: boolean = false;
+
     for (const arg of excludeArgs) {
       if (swi.startsWith(arg)) {
         exclude = true;
+
         break;
       }
     }
@@ -602,6 +610,7 @@ async function parseAnySwitchFromToolArguments(
       stdout,
       stderr
     );
+
     if (result.returnCode !== 0) {
       logger.message(
         localize(
@@ -692,6 +701,7 @@ function parseMultipleSwitchFromToolArguments(
       "|" +
       anythingBetweenQuotesBasicPattern('"') +
       (fullyQuoted ? "" : "|" + anythingBetweenQuotesBasicPattern("'"));
+
     return str;
   }
 
@@ -755,7 +765,9 @@ function parseMultipleSwitchFromToolArguments(
   while (match) {
     let matchIndex: number =
       match[2].startsWith("'") && match[2].endsWith("'") ? 8 : 26;
+
     let result: string = match[matchIndex];
+
     if (result) {
       if (removeSurroundingQuotes) {
         result = util.removeSurroundingQuotes(result);
@@ -814,6 +826,7 @@ function parseMultipleSwitchesFromToolArguments(
     // If the current match is a simple switch, find it at index 15, otherwise at 12.
     // In each scenario, only one will have a value while the other is undefined.
     let result: string = match[12] || match[15];
+
     if (result) {
       result = result.trim();
       results.push(result);
@@ -857,6 +870,7 @@ function parseSingleSwitchFromToolArguments(
   match = regexp.exec(args);
   while (match) {
     let result: string = match[5];
+
     if (result) {
       result = result.trim();
       results.push(result);
@@ -928,8 +942,11 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     // (by removing the quotes while preserving the relative path).
     // This is a short term workaround.
     let idx: number = args.lastIndexOf(result);
+
     let echo: string = "' || echo ";
+
     let str: string = args.substring(idx - echo.length, idx);
+
     if (str === echo) {
       // not to use util.removeQuotes because that also removes double quotes "
       result = result.replace(/\'/gm, "");
@@ -1009,6 +1026,7 @@ async function currentPathAfterCommand(
         ? currentPathHistory[currentPathHistory.length - 1]
         : "";
     currentPathHistory.pop();
+
     let lastCurrentPath2: string =
       currentPathHistory.length > 0
         ? currentPathHistory[currentPathHistory.length - 1]
@@ -1069,6 +1087,7 @@ async function currentPathAfterCommand(
     let match: RegExpMatchArray | null = line.match(
       "(.*)(Entering directory ['`\"])(.*)['`\"]"
     );
+
     if (match) {
       newCurrentPath =
         (await util.makeFullPath(match[3], lastCurrentPath)) || "";
@@ -1155,6 +1174,7 @@ export async function parseCustomConfigProvider(
 
   async function doParsingChunk(): Promise<void> {
     let chunkIndex: number = 0;
+
     while (index < numberOfLines && chunkIndex <= chunkSize) {
       if (cancel.isCancellationRequested) {
         break;
@@ -1197,6 +1217,7 @@ export async function parseCustomConfigProvider(
 
         // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
         let compilerFullPath: string = compilerTool.fullPath || "";
+
         if (!compilerTool.found) {
           let toolBaseName: string = path.basename(compilerFullPath);
           compilerFullPath = path.join(
@@ -1219,16 +1240,19 @@ export async function parseCustomConfigProvider(
           "I"
         );
         includes = await util.makeFullPaths(includes, currentPath);
+
         let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(
           compilerTool.arguments,
           "FI"
         );
+
         forcedIncludes = forcedIncludes.concat(
           parseMultipleSwitchFromToolArguments(
             compilerTool.arguments,
             "include"
           )
         );
+
         forcedIncludes = await util.makeFullPaths(forcedIncludes, currentPath);
 
         let defines: string[] = parseMultipleSwitchFromToolArguments(
@@ -1241,6 +1265,7 @@ export async function parseCustomConfigProvider(
         let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(
           compilerTool.arguments
         );
+
         let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(
           ext.extension.getCppToolsVersion(),
           compilerFullPath,
@@ -1249,6 +1274,7 @@ export async function parseCustomConfigProvider(
 
         // For windows, parse the sdk version
         let windowsSDKVersion: string | undefined = "";
+
         if (process.platform === "win32") {
           windowsSDKVersion = process.env["WindowsSDKVersion"];
         }
@@ -1262,10 +1288,13 @@ export async function parseCustomConfigProvider(
 
         // The language represented by this compilation command
         let language: util.Language;
+
         let hasC: boolean =
           files.filter((file) => file.endsWith(".c")).length > 0;
+
         let hasCpp: boolean =
           files.filter((file) => file.endsWith(".cpp")).length > 0;
+
         if (hasC && !hasCpp) {
           language = "c";
         } else if (hasCpp && !hasC) {
@@ -1415,6 +1444,7 @@ export async function parseLaunchConfigurations(
   let done: boolean = false;
   let doLinkCommandsParsingChunk: () => Promise<void> = async () => {
     let chunkIndex: number = 0;
+
     while (index < numberOfLines && chunkIndex <= chunkSize) {
       if (cancel.isCancellationRequested) {
         break;
@@ -1444,6 +1474,7 @@ export async function parseLaunchConfigurations(
           compilers,
           currentPath
         );
+
         if (compilerTool) {
           // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
           // Note: no need to worry about the DLL case that this extension doesn't support yet
@@ -1482,6 +1513,7 @@ export async function parseLaunchConfigurations(
                   parseSingleSwitchFromToolArguments(compilerTool.arguments, [
                     "Fo",
                   ]);
+
                 if (objFile) {
                   let parsedObjPath: path.ParsedPath = path.parse(objFile);
                   compilerTargetBinary = parsedObjPath.name + ".exe";
@@ -1514,6 +1546,7 @@ export async function parseLaunchConfigurations(
                     compilerTool.arguments,
                     sourceFileExtensions
                   );
+
                 if (srcFiles.length >= 1) {
                   let parsedSourcePath: path.ParsedPath = path.parse(
                     srcFiles[0]
@@ -1594,6 +1627,7 @@ export async function parseLaunchConfigurations(
                   linkerTool.arguments,
                   ["obj", "lib"]
                 );
+
                 if (files.length >= 1) {
                   let parsedPath: path.ParsedPath = path.parse(files[0]);
                   let targetBinaryFromFirstObjLib: string =
@@ -1740,6 +1774,7 @@ export async function parseLaunchConfigurations(
   let targetBinariesNames: string[] = [];
   targetBinaries.forEach((target) => {
     let parsedPath: path.ParsedPath = path.parse(target);
+
     if (!targetBinariesNames.includes(parsedPath.name)) {
       if (process.platform === "win32" && parsedPath.ext === "exe") {
         targetBinariesNames.push(util.escapeString(parsedPath.name));
@@ -1753,6 +1788,7 @@ export async function parseLaunchConfigurations(
   done = false;
   let doBinaryInvocationsParsingChunk: () => Promise<void> = async () => {
     let chunkIndex: number = 0;
+
     while (index < numberOfLines && chunkIndex <= chunkSize) {
       if (cancel.isCancellationRequested) {
         break;
@@ -1889,6 +1925,7 @@ function getIntelliSenseMode(
     const clArch: string = path
       .basename(path.dirname(compilerPath))
       .toLocaleLowerCase();
+
     switch (clArch) {
       case "arm64":
         return canUseArm ? "msvc-arm64" : "msvc-x64";
@@ -1981,6 +2018,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
       const verStr: string | undefined = arch?.substr(4, 1);
       if (verStr) {
         const verNum: number = +verStr;
+
         if (verNum <= 7) {
           targetArch = "arm";
         }
@@ -2015,6 +2053,7 @@ export function parseStandard(
     }
   } else if (language === "cpp") {
     standard = parseCppStandard(std, canUseGnu, canUseCxx23);
+
     if (!standard) {
       logger.message(
         localize(
@@ -2027,6 +2066,7 @@ export function parseStandard(
     }
   } else if (language === "c") {
     standard = parseCStandard(std, canUseGnu);
+
     if (!standard) {
       logger.message(
         localize(
@@ -2039,6 +2079,7 @@ export function parseStandard(
     }
   } else if (language === undefined) {
     standard = parseCppStandard(std, canUseGnu, canUseCxx23);
+
     if (!standard) {
       standard = parseCStandard(std, canUseGnu);
     }

@@ -25,9 +25,11 @@ nls.config({
 	messageFormat: nls.MessageFormat.bundle,
 	bundleFormat: nls.BundleFormat.standalone,
 })();
+
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 let statusBar: ui.UI = ui.getUI();
+
 let launcher: launch.Launcher = launch.getLauncher();
 
 export let extension: MakefileToolsExtension;
@@ -79,6 +81,7 @@ export class MakefileToolsExtension {
 
 	public dispose(): void {
 		this._projectOutlineTreeView.dispose();
+
 		if (this.cppToolsAPI) {
 			this.cppToolsAPI.dispose();
 		}
@@ -180,6 +183,7 @@ export class MakefileToolsExtension {
 		customConfigProviderItem: parser.CustomConfigProviderItem,
 	): void {
 		this.compilerFullPath = customConfigProviderItem.compilerFullPath;
+
 		let provider: cpptools.CustomConfigurationProvider =
 			make.getDeltaCustomConfigurationProvider();
 
@@ -198,6 +202,7 @@ export class MakefileToolsExtension {
 		// of all the compiler invocations of the current configuration
 		customConfigProviderItem.files.forEach((filePath) => {
 			let uri: vscode.Uri = vscode.Uri.file(filePath);
+
 			let sourceFileConfigurationItem: cpptools.SourceFileConfigurationItem =
 				{
 					uri,
@@ -224,6 +229,7 @@ export class MakefileToolsExtension {
 				.logConfigurationProviderItem(sourceFileConfigurationItem);
 
 			let folder: string = path.dirname(filePath);
+
 			if (!this.cummulativeBrowsePath.includes(folder)) {
 				this.cummulativeBrowsePath.push(folder);
 			}
@@ -237,6 +243,7 @@ export class MakefileToolsExtension {
 
 		customConfigProviderItem.forcedIncludes.forEach((fincl) => {
 			let folder: string = path.dirname(fincl);
+
 			if (!this.cummulativeBrowsePath.includes(folder)) {
 				this.cummulativeBrowsePath.push(fincl);
 			}
@@ -296,6 +303,7 @@ export async function activate(
 			"makefile.getConfiguration",
 			async () => {
 				telemetry.logEvent("getConfiguration");
+
 				return configuration.getCurrentMakefileConfiguration();
 			},
 		),
@@ -310,6 +318,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.getBuildTarget", async () => {
 			telemetry.logEvent("getBuildTarget");
+
 			return configuration.getCurrentTarget() || "";
 		}),
 	);
@@ -374,6 +383,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.getLaunchTargetPath", () => {
 			telemetry.logEvent("getLaunchTargetPath");
+
 			return launcher.getLaunchTargetPath();
 		}),
 	);
@@ -381,6 +391,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.launchTargetPath", () => {
 			telemetry.logEvent("launchTargetPath");
+
 			return launcher.launchTargetPath();
 		}),
 	);
@@ -390,6 +401,7 @@ export async function activate(
 			"makefile.getLaunchTargetDirectory",
 			() => {
 				telemetry.logEvent("getLaunchTargetDirectory");
+
 				return launcher.getLaunchTargetDirectory();
 			},
 		),
@@ -400,6 +412,7 @@ export async function activate(
 			"makefile.getLaunchTargetFileName",
 			() => {
 				telemetry.logEvent("getLaunchTargetFileName");
+
 				return launcher.getLaunchTargetFileName();
 			},
 		),
@@ -408,6 +421,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.launchTargetFileName", () => {
 			telemetry.logEvent("launchTargetFileName");
+
 			return launcher.launchTargetFileName();
 		}),
 	);
@@ -415,6 +429,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.getLaunchTargetArgs", () => {
 			telemetry.logEvent("getLaunchTargetArgs");
+
 			return launcher.getLaunchTargetArgs();
 		}),
 	);
@@ -424,6 +439,7 @@ export async function activate(
 			"makefile.getLaunchTargetArgsConcat",
 			() => {
 				telemetry.logEvent("getLaunchTargetArgsConcat");
+
 				return launcher.getLaunchTargetArgsConcat();
 			},
 		),
@@ -432,6 +448,7 @@ export async function activate(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("makefile.makeBaseDirectory", () => {
 			telemetry.logEvent("makeBaseDirectory");
+
 			return configuration.makeBaseDirectory();
 		}),
 	);
@@ -602,6 +619,7 @@ export async function activate(
 			"makefile.outline.openMakefileFile",
 			async () => {
 				const makefile = configuration.getConfigurationMakefile();
+
 				if (makefile) {
 					if (util.checkFileExistsSync(makefile)) {
 						await openFile(vscode.Uri.file(makefile));
@@ -642,6 +660,7 @@ export async function activate(
 			"makefile.outline.openBuildLogFile",
 			async () => {
 				const buildLog = configuration.getBuildLog();
+
 				if (buildLog) {
 					if (util.checkFileExistsSync(buildLog)) {
 						await openFile(vscode.Uri.file(buildLog));
@@ -788,10 +807,12 @@ export async function activate(
 
 	if (extension.getFullFeatureSet()) {
 		let shouldConfigure = configuration.getConfigureOnOpen();
+
 		if (shouldConfigure === null) {
 			// Ask if the user wants to configure on open with the Makefile Tools extension.
 			interface Choice1 {
 				title: string;
+
 				doConfigure: boolean;
 			}
 			vscode.window
@@ -821,6 +842,7 @@ export async function activate(
 									"never.configure.on.open",
 									"Configure C++ IntelliSense using information from your Makefiles upon opening?",
 								);
+
 						const buttonMessages = chosen.doConfigure
 							? [
 									localize("yes.button", "Yes"),
@@ -857,17 +879,20 @@ export async function activate(
 									telemetry.logConfigureOnOpenTelemetry(
 										chosen.doConfigure,
 									);
+
 									return;
 								}
 
 								let configTarget =
 									vscode.ConfigurationTarget.Global;
+
 								if (choice.persistMode === "workspace") {
 									configTarget =
 										vscode.ConfigurationTarget.Workspace;
 								}
 								const workspaceFolder =
 									vscode.workspace.workspaceFolders?.[0];
+
 								if (workspaceFolder) {
 									await vscode.workspace
 										.getConfiguration(
@@ -888,6 +913,7 @@ export async function activate(
 							});
 
 						shouldConfigure = chosen.doConfigure;
+
 						if (shouldConfigure === true) {
 							await make.cleanConfigure(
 								make.TriggeredBy.cleanConfigureOnOpen,
@@ -906,7 +932,9 @@ export async function activate(
 	// Analyze settings for type validation and telemetry
 	let workspaceConfiguration: vscode.WorkspaceConfiguration =
 		vscode.workspace.getConfiguration("makefile");
+
 	let telemetryProperties: telemetry.Properties | null = {};
+
 	try {
 		telemetryProperties = await telemetry.analyzeSettings(
 			workspaceConfiguration,

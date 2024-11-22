@@ -88,6 +88,7 @@ export function logEvent(
 function filterSetting(value: any, key: string, defaultValue: string): string {
 	if (key === "makefile.dryrunSwitches") {
 		let dryrunSwitches: string[] = value;
+
 		let filteredSwitches: string[] | undefined = dryrunSwitches.map(
 			(sw) => {
 				switch (sw) {
@@ -108,6 +109,7 @@ function filterSetting(value: any, key: string, defaultValue: string): string {
 					case "--print-directory":
 					case "-w":
 						return sw;
+
 					default:
 						return "...";
 				}
@@ -140,8 +142,10 @@ function activeArrayItem(setting: string, key: string): number {
 	if (key === "makefile.configurations") {
 		let makefileConfigurations: configuration.MakefileConfiguration[] =
 			configuration.getMakefileConfigurations();
+
 		let currentMakefileConfigurationName: string | undefined =
 			configuration.getCurrentMakefileConfiguration();
+
 		if (!currentMakefileConfigurationName) {
 			return -1;
 		}
@@ -162,6 +166,7 @@ function activeArrayItem(setting: string, key: string): number {
 	if (key === "makefile.launchConfigurations") {
 		let launchConfigurations: configuration.LaunchConfiguration[] =
 			configuration.getLaunchConfigurations();
+
 		let currentLaunchConfiguration:
 			| configuration.LaunchConfiguration
 			| undefined = launchConfigurations.find((config) => {
@@ -198,11 +203,16 @@ function activeArrayItem(setting: string, key: string): number {
 // Calling this earlier would result in different dot patterns.
 function filterKey(key: string): string {
 	let filteredKey: string = key;
+
 	let lastDot: number = key.lastIndexOf(".");
+
 	let beforeLastDot: number = key.lastIndexOf(".", lastDot - 1);
+
 	if (lastDot !== -1 && beforeLastDot !== -1) {
 		let lastProp: any = key.substring(beforeLastDot + 1, lastDot);
+
 		let numericalProp: number = Number.parseInt(lastProp);
+
 		if (!Number.isNaN(numericalProp)) {
 			filteredKey = filteredKey.replace(`${numericalProp}.`, "");
 		}
@@ -227,6 +237,7 @@ export async function analyzeSettings(
 	// type can be undefined if setting is null,
 	// which happens when the user removes that setting.
 	let type: string | undefined = setting ? typeof setting : undefined;
+
 	let jsonType: string | undefined = propSchema.type
 		? propSchema.type
 		: undefined;
@@ -260,18 +271,23 @@ export async function analyzeSettings(
 	// Enum values always safe to report.
 	// Validate the allowed values against the expanded variable.
 	let enumValues: any[] = propSchema.enum;
+
 	if (enumValues && enumValues.length > 0) {
 		const regexp: RegExp = /(makefile\.)(.+)/gm;
+
 		const res: RegExpExecArray | null = regexp.exec(key);
+
 		let expandedSetting: string = res
 			? await util.getExpandedSetting<string>(res[2])
 			: setting;
+
 		if (!enumValues.includes(expandedSetting)) {
 			telemetryLogger(
 				`Invalid value "${expandedSetting}" for enum "${key}". Only "${enumValues.join(
 					";",
 				)}" values are allowed."`,
 			);
+
 			if (telemetryProperties) {
 				telemetryProperties[filterKey(key)] = "invalid";
 			}
@@ -316,22 +332,29 @@ export async function analyzeSettings(
 					key,
 					propSchema.default,
 				);
+
 				break;
 			}
 		/* falls through */
 
 		case "object":
 			let settingsProps: string[] = Object.getOwnPropertyNames(setting);
+
 			let index: number = -1;
+
 			let active: number = 0;
+
 			if (jsonType === "array") {
 				active = activeArrayItem(setting, key);
 			}
 
 			settingsProps.forEach(async (prop) => {
 				index++;
+
 				let jsonProps: any;
+
 				let newPropObj: any = setting[prop];
+
 				if (jsonType === "array") {
 					jsonProps = propSchema.items.properties || propSchema.items;
 				} else {
@@ -342,10 +365,13 @@ export async function analyzeSettings(
 					// Otherwise we will not read anything useful about such a setting and we will also
 					// report a schema mismatch, even if it is written correctly.
 					let newProp: string = prop;
+
 					let newFullProp: string =
 						key === "makefile" ? key + "." : "";
+
 					while (jsonProps === undefined && newProp !== "") {
 						newFullProp = newFullProp + newProp;
+
 						if (propSchema.properties) {
 							jsonProps = Object.getOwnPropertyNames(
 								propSchema.properties,
@@ -409,6 +435,7 @@ export async function analyzeSettings(
 					}
 				}
 			});
+
 			break;
 
 		default:
@@ -420,6 +447,7 @@ export async function analyzeSettings(
 
 function createReporter(): TelemetryReporter | null {
 	const packageInfo: IPackageInfo = getPackageInfo();
+
 	if (packageInfo && packageInfo.aiKey) {
 		return new TelemetryReporter(packageInfo.aiKey);
 	}
@@ -428,6 +456,7 @@ function createReporter(): TelemetryReporter | null {
 
 function getPackageInfo(): IPackageInfo {
 	const packageJSON: util.PackageJSON = util.thisExtensionPackage();
+
 	return {
 		name: `${packageJSON.publisher}.${packageJSON.name}`,
 		version: packageJSON.version,
