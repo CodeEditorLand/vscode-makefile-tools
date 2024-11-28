@@ -28,6 +28,7 @@ const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 const recursiveString = localize("recursive", "(recursive)");
 
 let isBuilding: boolean = false;
+
 export function getIsBuilding(): boolean {
 	return isBuilding;
 }
@@ -36,6 +37,7 @@ export function setIsBuilding(building: boolean): void {
 }
 
 let isConfiguring: boolean = false;
+
 export function getIsConfiguring(): boolean {
 	return isConfiguring;
 }
@@ -44,6 +46,7 @@ export function setIsConfiguring(configuring: boolean): void {
 }
 
 let configureIsInBackground: boolean = false;
+
 export function getConfigureIsInBackground(): boolean {
 	return configureIsInBackground;
 }
@@ -52,6 +55,7 @@ export function setConfigureIsInBackground(background: boolean): void {
 }
 
 let configureIsClean: boolean = false;
+
 export function getConfigureIsClean(): boolean {
 	return configureIsClean;
 }
@@ -60,6 +64,7 @@ export function setConfigureIsClean(clean: boolean): void {
 }
 
 let isPreConfiguring: boolean = false;
+
 export function getIsPreConfiguring(): boolean {
 	return isPreConfiguring;
 }
@@ -68,6 +73,7 @@ export function setIsPreConfiguring(preConfiguring: boolean): void {
 }
 
 let isPostConfiguring: boolean = false;
+
 export function getIsPostConfiguring(): boolean {
 	return isPostConfiguring;
 }
@@ -131,6 +137,7 @@ let fileIndex: Map<string, cpptools.SourceFileConfigurationItem> = new Map<
 let workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = {
 	browsePath: [],
 };
+
 export function getDeltaCustomConfigurationProvider(): cpptools.CustomConfigurationProvider {
 	let provider: cpptools.CustomConfigurationProvider = {
 		fileIndex: fileIndex,
@@ -288,6 +295,7 @@ function processTargetForTelemetry(target: string | undefined): string {
 // (make for configure, make for build or pre-configure cmd/bash).
 // TODO: improve the code regarding curPID and how util.spawnChildProcess is setting it in make.ts unit.
 let curPID: number = -1;
+
 export function getCurPID(): number {
 	return curPID;
 }
@@ -610,6 +618,7 @@ export async function doBuildTarget(
 // Represents the content of the provided makefile.buildLog or a fresh output of make --dry-run
 // (which is also written into makefile.configurationCachePath).
 let parseContent: string | undefined;
+
 export function getParseContent(): string | undefined {
 	return parseContent;
 }
@@ -619,6 +628,7 @@ export function setParseContent(content: string): void {
 
 // The source file of parseContent (build log or configuration dryrun cache).
 let parseFile: string | undefined;
+
 export function getParseFile(): string | undefined {
 	return parseFile;
 }

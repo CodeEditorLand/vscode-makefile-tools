@@ -11,6 +11,7 @@ import * as logger from "./logger";
 import * as util from "./util";
 
 export type Properties = { [key: string]: string };
+
 export type Measures = { [key: string]: number };
 
 interface IPackageInfo {
@@ -465,6 +466,7 @@ function getPackageInfo(): IPackageInfo {
 }
 
 export type ConfigureOnOpenScope = "user" | "workspace";
+
 export function logConfigureOnOpenTelemetry(
 	configureOnOpen: boolean,
 	scope: ConfigureOnOpenScope | undefined = undefined,

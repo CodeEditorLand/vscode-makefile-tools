@@ -78,6 +78,7 @@ export interface MakefileConfiguration {
 // Saved into the workspace state. Also reflected in the configuration status bar button.
 // If no particular current configuration is defined in settings, set to 'Default'.
 let currentMakefileConfiguration: string;
+
 export function getCurrentMakefileConfiguration(): string {
 	return currentMakefileConfiguration;
 }
@@ -232,6 +233,7 @@ async function readFeaturesVisibility(): Promise<void> {
 }
 
 let makePath: string | undefined;
+
 export function getMakePath(): string | undefined {
 	return makePath;
 }
@@ -256,6 +258,7 @@ async function readMakePath(): Promise<void> {
 }
 
 let makefilePath: string | undefined;
+
 export function getMakefilePath(): string | undefined {
 	return makefilePath;
 }
@@ -282,6 +285,7 @@ async function readMakefilePath(): Promise<void> {
 }
 
 let makeDirectory: string | undefined;
+
 export function getMakeDirectory(): string | undefined {
 	return makeDirectory;
 }
@@ -338,6 +342,7 @@ export function makeBaseDirectory(): string {
 }
 
 let buildLog: string | undefined;
+
 export function getBuildLog(): string | undefined {
 	return buildLog;
 }
@@ -392,6 +397,7 @@ export async function readBuildLog(): Promise<boolean> {
 }
 
 let loggingLevel: string | undefined;
+
 export function getLoggingLevel(): string | undefined {
 	return loggingLevel;
 }
@@ -409,6 +415,7 @@ export async function readLoggingLevel(): Promise<void> {
 }
 
 let extensionOutputFolder: string | undefined;
+
 export function getExtensionOutputFolder(): string | undefined {
 	return extensionOutputFolder;
 }
@@ -464,6 +471,7 @@ export async function readExtensionOutputFolder(): Promise<void> {
 }
 
 let extensionLog: string | undefined;
+
 export function getExtensionLog(): string | undefined {
 	return extensionLog;
 }
@@ -504,6 +512,7 @@ export async function readExtensionLog(): Promise<void> {
 }
 
 let preConfigureScript: string | undefined;
+
 export function getPreConfigureScript(): string | undefined {
 	return preConfigureScript;
 }
@@ -512,6 +521,7 @@ export function setPreConfigureScript(path: string): void {
 }
 
 let preConfigureArgs: string[] = [];
+
 export function getPreConfigureArgs(): string[] {
 	return preConfigureArgs;
 }
@@ -520,6 +530,7 @@ export function setPreConfigureArgs(args: string[]): void {
 }
 
 let postConfigureScript: string | undefined;
+
 export function getPostConfigureScript(): string | undefined {
 	return postConfigureScript;
 }
@@ -528,6 +539,7 @@ export function setPostConfigureScript(path: string): void {
 }
 
 let postConfigureArgs: string[] = [];
+
 export function getPostConfigureArgs(): string[] {
 	return postConfigureArgs;
 }
@@ -619,6 +631,7 @@ export async function readPostConfigureArgs(): Promise<void> {
 }
 
 let alwaysPreConfigure: boolean | undefined;
+
 export function getAlwaysPreConfigure(): boolean | undefined {
 	return alwaysPreConfigure;
 }
@@ -627,6 +640,7 @@ export function setAlwaysPreConfigure(path: boolean): void {
 }
 
 let alwaysPostConfigure: boolean | undefined;
+
 export function getAlwaysPostConfigure(): boolean | undefined {
 	return alwaysPostConfigure;
 }
@@ -662,6 +676,7 @@ export async function readAlwaysPostConfigure(): Promise<void> {
 }
 
 let configurationCachePath: string | undefined;
+
 export function getConfigurationCachePath(): string | undefined {
 	return configurationCachePath;
 }
@@ -714,6 +729,7 @@ export async function readConfigurationCachePath(): Promise<void> {
 }
 
 let compileCommandsPath: string | undefined;
+
 export function getCompileCommandsPath(): string | undefined {
 	return compileCommandsPath;
 }
@@ -739,6 +755,7 @@ export async function readCompileCommandsPath(): Promise<void> {
 }
 
 let additionalCompilerNames: string[] | undefined;
+
 export function getAdditionalCompilerNames(): string[] | undefined {
 	return additionalCompilerNames;
 }
@@ -762,6 +779,7 @@ export async function readAdditionalCompilerNames(): Promise<void> {
 }
 
 let excludeCompilerNames: string[] | undefined;
+
 export function getExcludeCompilerNames(): string[] | undefined {
 	return excludeCompilerNames;
 }
@@ -785,6 +803,7 @@ export async function readExcludeCompilerNames(): Promise<void> {
 }
 
 let dryrunSwitches: string[] | undefined;
+
 export function getDryrunSwitches(): string[] | undefined {
 	return dryrunSwitches;
 }
@@ -835,6 +854,7 @@ export interface LaunchConfiguration {
 }
 
 let launchConfigurations: LaunchConfiguration[] = [];
+
 export function getLaunchConfigurations(): LaunchConfiguration[] {
 	return launchConfigurations;
 }
@@ -901,6 +921,7 @@ export async function stringToLaunchConfiguration(
 }
 
 let currentLaunchConfiguration: LaunchConfiguration | undefined;
+
 export function getCurrentLaunchConfiguration():
 	| LaunchConfiguration
 	| undefined {
@@ -995,6 +1016,7 @@ export interface DefaultLaunchConfiguration {
 }
 
 let defaultLaunchConfiguration: DefaultLaunchConfiguration | undefined;
+
 export function getDefaultLaunchConfiguration():
 	| DefaultLaunchConfiguration
 	| undefined {
@@ -1023,6 +1045,7 @@ export async function readDefaultLaunchConfiguration(): Promise<void> {
 // when parsing all the targets that exist and when updating the cpptools configuration provider
 // for IntelliSense.
 let configurationMakeCommand: string;
+
 export function getConfigurationMakeCommand(): string {
 	return configurationMakeCommand;
 }
@@ -1031,6 +1054,7 @@ export function setConfigurationMakeCommand(name: string): void {
 }
 
 let configurationMakeArgs: string[] = [];
+
 export function getConfigurationMakeArgs(): string[] {
 	return configurationMakeArgs;
 }
@@ -1042,6 +1066,7 @@ export function setConfigurationMakeArgs(args: string[]): void {
 // are deduced via a set of rules of defaults and overrides that we calculate only when necessary
 // and access the last result otherwise.
 let configurationMakefile: string | undefined;
+
 export function getConfigurationMakefile(): string | undefined {
 	return configurationMakefile;
 }
@@ -1052,6 +1077,7 @@ export function setConfigurationMakefile(
 }
 
 let configurationProblemMatchers: string[] = [];
+
 export function getConfigurationProblemMatchers(): string[] {
 	return configurationProblemMatchers;
 }
@@ -1062,6 +1088,7 @@ export function setConfigurationProblemMatchers(
 }
 
 let configurationBuildLog: string | undefined;
+
 export function getConfigurationBuildLog(): string | undefined {
 	return configurationBuildLog;
 }
@@ -1070,6 +1097,7 @@ export function setConfigurationBuildLog(name: string): void {
 }
 
 let configurationPreConfigureArgs: string[] = [];
+
 export function getConfigurationPreConfigureArgs(): string[] {
 	return configurationPreConfigureArgs;
 }
@@ -1078,6 +1106,7 @@ export function setConfigurationPreConfigureArgs(args: string[]): void {
 }
 
 let configurationPostConfigureArgs: string[] = [];
+
 export function getConfigurationPostConfigureArgs(): string[] {
 	return configurationPostConfigureArgs;
 }
@@ -1451,6 +1480,7 @@ export function getPostConfigureArgsForConfiguration(
 }
 
 let makefileConfigurations: MakefileConfiguration[] = [];
+
 export function getMakefileConfigurations(): MakefileConfiguration[] {
 	return makefileConfigurations;
 }
@@ -1573,6 +1603,7 @@ export async function readMakefileConfigurations(): Promise<void> {
 // when building for the current configuration.
 // Saved into the settings storage. Also reflected in the configuration status bar button
 let currentTarget: string | undefined;
+
 export function getCurrentTarget(): string | undefined {
 	return currentTarget;
 }
@@ -1609,6 +1640,7 @@ function readCurrentTarget(): void {
 }
 
 let configureOnOpen: boolean | undefined;
+
 export function getConfigureOnOpen(): boolean | undefined {
 	return configureOnOpen;
 }
@@ -1627,6 +1659,7 @@ export async function readConfigureOnOpen(): Promise<void> {
 }
 
 let configureOnEdit: boolean | undefined;
+
 export function getConfigureOnEdit(): boolean | undefined {
 	return configureOnEdit;
 }
@@ -1645,6 +1678,7 @@ export async function readConfigureOnEdit(): Promise<void> {
 }
 
 let configureAfterCommand: boolean | undefined;
+
 export function getConfigureAfterCommand(): boolean | undefined {
 	return configureAfterCommand;
 }
@@ -1665,6 +1699,7 @@ export async function readConfigureAfterCommand(): Promise<void> {
 }
 
 let phonyOnlyTargets: boolean | undefined;
+
 export function getPhonyOnlyTargets(): boolean | undefined {
 	return phonyOnlyTargets;
 }
@@ -1684,6 +1719,7 @@ export async function readPhonyOnlyTargets(): Promise<void> {
 }
 
 let saveBeforeBuildOrConfigure: boolean | undefined;
+
 export function getSaveBeforeBuildOrConfigure(): boolean | undefined {
 	return saveBeforeBuildOrConfigure;
 }
@@ -1704,6 +1740,7 @@ export async function readSaveBeforeBuildOrConfigure(): Promise<void> {
 }
 
 let buildBeforeLaunch: boolean | undefined;
+
 export function getBuildBeforeLaunch(): boolean | undefined {
 	return buildBeforeLaunch;
 }
@@ -1723,6 +1760,7 @@ export async function readBuildBeforeLaunch(): Promise<void> {
 }
 
 let clearOutputBeforeBuild: boolean | undefined;
+
 export function getClearOutputBeforeBuild(): boolean | undefined {
 	return clearOutputBeforeBuild;
 }
@@ -1749,6 +1787,7 @@ export async function readClearOutputBeforeBuild(): Promise<void> {
 // (which prints the messages regarding "Entering direcory" and "Leaving directory"),
 // which is not perfect either for all repos.
 let ignoreDirectoryCommands: boolean | undefined;
+
 export function getIgnoreDirectoryCommands(): boolean | undefined {
 	return ignoreDirectoryCommands;
 }
@@ -2920,6 +2959,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
 // (like any object produced by the compiler from a source code file).
 // TODO: filter only the relevant targets (binaries, libraries, etc...) from this list.
 let buildTargets: string[] = [];
+
 export function getBuildTargets(): string[] {
 	return buildTargets;
 }
@@ -2945,6 +2985,7 @@ export function setBuildTargets(targets: string[]): void {
 // out of date and most importantly a subset. We want the quick pick to reflect all the possibilities
 // that are found available with the current configuration of the project.
 let launchTargets: string[] = [];
+
 export function getLaunchTargets(): string[] {
 	return launchTargets;
 }

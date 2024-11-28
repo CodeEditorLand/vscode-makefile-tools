@@ -622,6 +622,7 @@ export function makeRelPaths(
 // because many file operations don't work properly with paths
 // having quotes in the middle.
 const quotesStr: string[] = ["'", '"', "`"];
+
 export function removeQuotes(str: string): string {
 	for (const p in quotesStr) {
 		if (str.includes(quotesStr[p])) {
