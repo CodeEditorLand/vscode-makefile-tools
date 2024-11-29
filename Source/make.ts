@@ -150,6 +150,7 @@ export function setCustomConfigurationProvider(
 	provider: cpptools.CustomConfigurationProvider,
 ): void {
 	fileIndex = provider.fileIndex;
+
 	workspaceBrowseConfiguration = provider.workspaceBrowse;
 }
 
@@ -398,12 +399,14 @@ export async function buildTarget(
 							"Cancelling...",
 						),
 					});
+
 					logger.message(
 						localize(
 							"user.cancelling.build",
 							"The user is cancelling the build...",
 						),
 					);
+
 					cancelBuild = true;
 
 					// Kill the task that is used for building.
@@ -422,6 +425,7 @@ export async function buildTarget(
 							makefileBuildTaskName,
 						),
 					);
+
 					myTask?.terminate();
 				});
 
@@ -472,6 +476,7 @@ export async function buildTarget(
 					telemetryProperties.configureExitCode =
 						configureExitCode.toString();
 				}
+
 				if (configureElapsedTime !== undefined) {
 					telemetryMeasures.configureElapsedTime =
 						configureElapsedTime;
@@ -556,7 +561,9 @@ export async function doBuildTarget(
 
 		myTask.problemMatchers =
 			configuration.getConfigurationProblemMatchers();
+
 		myTask.presentationOptions.clear = clearTerminalOutput;
+
 		myTask.presentationOptions.showReuseMessage = true;
 
 		logger.message(
@@ -570,6 +577,7 @@ export async function doBuildTarget(
 			),
 			"Debug",
 		);
+
 		await vscode.tasks.executeTask(myTask);
 
 		const result: number = await new Promise<number>((resolve) => {
@@ -578,6 +586,7 @@ export async function doBuildTarget(
 					(e: vscode.TaskProcessEndEvent) => {
 						if (e.execution.task.name === makefileBuildTaskName) {
 							disposable.dispose();
+
 							resolve(
 								e.exitCode ??
 									ConfigureBuildReturnCodeTypes.other,
@@ -690,6 +699,7 @@ export async function generateParseContent(
 		"make.generating.forTargets",
 		"(for targets specifically)",
 	);
+
 	progress.report({
 		increment: 1,
 		message:
@@ -732,9 +742,13 @@ export async function generateParseContent(
 
 	if (forTargets) {
 		makeArgs.push("--print-data-base");
+
 		makeArgs.push("--no-builtin-variables");
+
 		makeArgs.push("--no-builtin-rules");
+
 		makeArgs.push("--question");
+
 		logger.messageNoCR(
 			localize(
 				"generating.targets.with.command",
@@ -781,7 +795,9 @@ export async function generateParseContent(
 		if (extensionOutputFolder) {
 			dryrunFile = path.join(extensionOutputFolder, dryrunFile);
 		}
+
 		dryrunFile = util.resolvePathToRoot(dryrunFile);
+
 		logger.message(
 			localize(
 				"writing.dry.run.output",
@@ -810,7 +826,9 @@ export async function generateParseContent(
 
 		let stdout: any = (result: string): void => {
 			const appendStr: string = `${result} ${lineEnding}`;
+
 			completeOutput += appendStr;
+
 			fs.appendFileSync(dryrunFile, appendStr);
 
 			progress.report({
@@ -834,7 +852,9 @@ export async function generateParseContent(
 			if (process.env["MAKEFILE_TOOLS_TESTING"] !== "1") {
 				appendStr += lineEnding;
 			}
+
 			fs.appendFileSync(dryrunFile, appendStr);
+
 			stderrStr += appendStr;
 
 			// Sometimes there is useful information coming via the stderr
@@ -851,12 +871,14 @@ export async function generateParseContent(
 				vscode.window.showWarningMessage(
 					"Dryrun timeout. See Makefile Tools Output Channel for details.",
 				);
+
 				logger.message(
 					localize(
 						"dryrun.timeout.verify",
 						"Dryrun timeout. Verify that the make command works properly in your development terminal (it could wait for stdin).",
 					),
 				);
+
 				logger.message(
 					localize(
 						"double.check.dryrun",
@@ -880,9 +902,11 @@ export async function generateParseContent(
 			stdout,
 			stderr,
 		);
+
 		clearInterval(timeout);
 
 		let elapsedTime: number = util.elapsedTimeSince(startTime);
+
 		logger.message(
 			localize(
 				"generating.dry.run.elapsed",
@@ -892,6 +916,7 @@ export async function generateParseContent(
 		);
 
 		parseFile = dryrunFile;
+
 		parseContent = completeOutput;
 
 		// The error codes returned by the targets invocation (make -pRrq) mean something else
@@ -908,12 +933,14 @@ export async function generateParseContent(
 					"The make dry-run command failed.",
 				),
 			);
+
 			logger.message(
 				localize(
 					"intellisense.may.not.work",
 					"IntelliSense may work only partially or not at all.",
 				),
 			);
+
 			logger.message(stderrStr);
 
 			// Report the standard dry-run error & guide only when the configure was not cancelled
@@ -993,6 +1020,7 @@ export async function prePostConfigureHelper(
 							"Cancelling...",
 						),
 					});
+
 					cancelConfigureScript = true;
 
 					logger.message(
@@ -1053,6 +1081,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
 				"Pre-configure failed: no script provided.",
 			),
 		);
+
 		logger.message(
 			localize(
 				"no.pre.configure.script.define.settings",
@@ -1070,6 +1099,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
 				"Could not find pre-configure script.",
 			),
 		);
+
 		logger.message(
 			localize(
 				"could.not.find.pre.configure.on.disk",
@@ -1105,6 +1135,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
 				exitCode: exitCode.toString(),
 				triggeredBy: triggeredBy,
 			};
+
 			telemetry.logEvent(
 				"preConfigure",
 				telemetryProperties,
@@ -1122,12 +1153,14 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
 			"no.postconfigure.script.provided",
 			"Post-configure failed: no script provided.",
 		);
+
 		vscode.window.showErrorMessage(error);
 
 		const loggerError = localize(
 			"no.post.configure.script.provided.logger",
 			"No post-configure script is set in settings. Make sure a post-configuration script path is defined with makefile.postConfigureScript.",
 		);
+
 		logger.message(loggerError);
 
 		return ConfigureBuildReturnCodeTypes.notFound;
@@ -1140,6 +1173,7 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
 				"Could not find post-configure script.",
 			),
 		);
+
 		logger.message(
 			localize(
 				"could.not.find.post.configure.on.disk",
@@ -1175,6 +1209,7 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
 				exitCode: exitCode.toString(),
 				triggeredBy: triggeredBy,
 			};
+
 			telemetry.logEvent(
 				"postConfigure",
 				telemetryProperties,
@@ -1189,6 +1224,7 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
 // set on windows or printenv on linux/mac.
 async function applyEnvironment(content: string | undefined): Promise<void> {
 	let lines: string[] = content?.split(/\r?\n/) || [];
+
 	lines.forEach((line) => {
 		let eqPos: number = line.search("=");
 		// Sometimes we get a "" line and searching for = returns -1. Skip.
@@ -1216,7 +1252,9 @@ export async function runPrePostConfigureScript(
 	scriptArgs: string[],
 	loggingMessages: {
 		success: string;
+
 		successWithSomeError: string;
+
 		failure: string;
 	},
 ): Promise<number> {
@@ -1237,17 +1275,22 @@ export async function runPrePostConfigureScript(
 
 	if (process.platform === "win32") {
 		wrapScriptContent = `call "${scriptFile}"`;
+
 		wrapScriptContent +=
 			scriptArgs.length > 0
 				? ` ${scriptArgs.join(" ").toString()}\r\n`
 				: "\r\n";
+
 		wrapScriptContent += `set > "${wrapScriptOutFile}"`;
+
 		wrapScriptFile += ".bat";
 	} else {
 		wrapScriptContent = `source '${scriptFile}' ${
 			scriptArgs.length > 0 ? scriptArgs.join(" ").toString() : ""
 		}\n`;
+
 		wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
+
 		wrapScriptFile += ".sh";
 	}
 
@@ -1259,17 +1302,22 @@ export async function runPrePostConfigureScript(
 
 	if (process.platform === "win32") {
 		runCommand = "cmd";
+
 		concreteScriptArgs.push("/c");
+
 		concreteScriptArgs.push(`"${wrapScriptFile}"`);
 	} else {
 		runCommand = "/bin/bash";
+
 		concreteScriptArgs.push("-c");
+
 		concreteScriptArgs.push(`"source '${wrapScriptFile}'"`);
 	}
 
 	try {
 		let stdout: any = (result: string): void => {
 			progress.report({ increment: 1, message: "..." });
+
 			logger.messageNoCR(result, "Normal");
 		};
 
@@ -1277,6 +1325,7 @@ export async function runPrePostConfigureScript(
 
 		let stderr: any = (result: string): void => {
 			someErr = true;
+
 			logger.messageNoCR(result, "Normal");
 		};
 
@@ -1300,6 +1349,7 @@ export async function runPrePostConfigureScript(
 				// return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
 				// of this specific situation.
 				result.returnCode = ConfigureBuildReturnCodeTypes.other;
+
 				logger.message(loggingMessages.successWithSomeError);
 			} else {
 				logger.message(loggingMessages.success);
@@ -1318,6 +1368,7 @@ export async function runPrePostConfigureScript(
 		return ConfigureBuildReturnCodeTypes.notFound;
 	} finally {
 		util.deleteFileSync(wrapScriptFile);
+
 		util.deleteFileSync(wrapScriptOutFile);
 	}
 }
@@ -1400,14 +1451,19 @@ export async function runPostConfigureScript(
 
 interface ConfigurationCache {
 	buildTargets: string[];
+
 	launchTargets: string[];
+
 	customConfigurationProvider: {
 		workspaceBrowse: cpp.WorkspaceBrowseConfiguration;
+
 		fileIndex: [
 			string,
 			{
 				uri: string | vscode.Uri;
+
 				configuration: cpp.SourceFileConfiguration;
+
 				compileCommand: parser.CompileCommand;
 			},
 		][];
@@ -1423,16 +1479,23 @@ function isConfigurationEmpty(configurationCache: ConfigurationCache): boolean {
 	) {
 		return true;
 	}
+
 	return false;
 }
 
 interface ConfigureSubphasesStatus {
 	loadFromCache?: ConfigureSubphaseStatus;
+
 	generateParseContent?: ConfigureSubphaseStatus;
+
 	preprocessParseContent?: ConfigureSubphaseStatus;
+
 	parseIntelliSense?: ConfigureSubphaseStatus;
+
 	parseLaunch?: ConfigureSubphaseStatus;
+
 	dryrunTargets?: ConfigureSubphaseStatus;
+
 	parseTargets?: ConfigureSubphaseStatus;
 
 	recursiveConfigure?: ConfigureSubphasesStatus;
@@ -1477,10 +1540,12 @@ function analyzeConfigureSubphases(stats: ConfigureSubphasesStatus): number {
 
 interface ConfigureSubphaseStatus {
 	retc: ConfigureBuildReturnCodeTypes;
+
 	elapsed: number;
 }
 interface ConfigureSubphaseStatusItem {
 	name: string;
+
 	status: ConfigureSubphaseStatus;
 }
 
@@ -1492,10 +1557,12 @@ function getRelevantConfigStats(stats: any): ConfigureSubphaseStatusItem[] {
 	let relevantStats: ConfigureSubphaseStatusItem[] = [];
 
 	let retCodeProps: string[] = Object.getOwnPropertyNames(stats);
+
 	retCodeProps.forEach((prop) => {
 		if (prop.toString() === "recursiveConfigure") {
 			let recursiveRetCodes: ConfigureSubphaseStatusItem[] =
 				getRelevantConfigStats(stats[prop]);
+
 			recursiveRetCodes.forEach((recursiveRetCode) => {
 				relevantStats.push({
 					name: prop.toString() + "." + recursiveRetCode.name,
@@ -1536,6 +1603,7 @@ export async function configure(
 	// to accurately identify in telemetry whether this project configured successfully out of the box or not.
 	let ranConfigureInCodebaseLifetime: boolean =
 		extension.getState().ranConfigureInCodebaseLifetime;
+
 	extension.getState().ranConfigureInCodebaseLifetime = true;
 
 	// If `fullFeatureSet` is false and it wasn't a manual command invocation, return and `other` return value.
@@ -1632,6 +1700,7 @@ export async function configure(
 	if (!currentBuildTarget || currentBuildTarget === "") {
 		currentBuildTarget = "all";
 	}
+
 	if (updateTargets && currentBuildTarget !== "all") {
 		processTargetsSeparately = true;
 	}
@@ -1658,6 +1727,7 @@ export async function configure(
 								curPID,
 							),
 						);
+
 						await vscode.window.withProgress(
 							{
 								location: vscode.ProgressLocation.Notification,
@@ -1733,6 +1803,7 @@ export async function configure(
 				e.message,
 			),
 		);
+
 		retc = ConfigureBuildReturnCodeTypes.other;
 
 		return e.errno;
@@ -1774,6 +1845,7 @@ export async function configure(
 					ConfigurationCache.customConfigurationProvider.fileIndex.map(
 						([, { compileCommand }]) => compileCommand,
 					);
+
 				util.writeFile(
 					compileCommandsPath,
 					JSON.stringify(compileCommands, undefined, 4),
@@ -1811,8 +1883,10 @@ export async function configure(
 
 		let subphases: ConfigureSubphaseStatusItem[] =
 			getRelevantConfigStats(subphaseStats);
+
 		subphases.forEach((phase) => {
 			telemetryMeasures[phase.name + ".exitCode"] = phase.status.retc;
+
 			telemetryMeasures[phase.name + ".elapsed"] = phase.status.elapsed;
 		});
 
@@ -1821,8 +1895,10 @@ export async function configure(
 			telemetryProperties.preConfigureExitCode =
 				preConfigureExitCode.toString();
 		}
+
 		if (preConfigureElapsedTime !== undefined) {
 			telemetryMeasures.preConfigureElapsedTime = preConfigureElapsedTime;
+
 			logger.message(
 				localize(
 					"preconfigure.elapsed.time",
@@ -1886,9 +1962,11 @@ export async function configure(
 			telemetryProperties.postConfigureExitCode =
 				postConfigureExitCode.toString();
 		}
+
 		if (postConfigureElapsedTime !== undefined) {
 			telemetryMeasures.postConfigureElapsedTime =
 				postConfigureElapsedTime;
+
 			logger.message(
 				localize(
 					"post.configure.elapsed.time",
@@ -1900,6 +1978,7 @@ export async function configure(
 
 		telemetryProperties.buildTarget =
 			processTargetForTelemetry(newBuildTarget);
+
 		telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
 
 		if (retc !== ConfigureBuildReturnCodeTypes.success) {
@@ -1947,6 +2026,7 @@ async function parseLaunchConfigurations(
 
 	if (retc === ConfigureBuildReturnCodeTypes.success) {
 		let launchConfigurationsStr: string[] = [];
+
 		launchConfigurations.forEach((config) => {
 			launchConfigurationsStr.push(
 				configuration.launchConfigurationToString(config),
@@ -1963,6 +2043,7 @@ async function parseLaunchConfigurations(
 				"no.launch.configurations",
 				"No launch configurations have been detected.",
 			);
+
 			logger.message(
 				getConfigureIsClean() ? cleanMessage : notCleanMessage,
 			);
@@ -1991,6 +2072,7 @@ async function parseLaunchConfigurations(
 				launchConfigurationsStr.length,
 				launchConfigurationsStr.join(";"),
 			);
+
 			logger.message(
 				getConfigureIsClean()
 					? notCleanLaunchTargetsString
@@ -2076,6 +2158,7 @@ async function parseTargets(
 				"new.build.targets",
 				"No new build targets have been detected.",
 			);
+
 			logger.message(
 				getConfigureIsClean()
 					? cleanBuildTargets
@@ -2097,6 +2180,7 @@ async function parseTargets(
 				targets.length,
 				targets.join(";"),
 			);
+
 			logger.message(
 				getConfigureIsClean()
 					? cleanBuildTargetsDefinedInMakefile
@@ -2158,6 +2242,7 @@ async function updateProvider(
 		"updating.cpptools.configuration.provider",
 		"Updating the CppTools IntelliSense Configuration Provider.",
 	);
+
 	logger.message(recursive ? recursiveString : nonRecursiveString);
 
 	let onStatus: any = (status: string): void => {
@@ -2190,12 +2275,14 @@ async function updateProvider(
 		// If this configure is clean, overwrite the final file index, otherwise merge with it.
 		let provider: cpptools.CustomConfigurationProvider =
 			getDeltaCustomConfigurationProvider();
+
 		extension
 			.getCppConfigurationProvider()
 			.mergeCustomConfigurationProvider(provider);
 
 		// Empty the 'delta' configurations.
 		provider.fileIndex.clear();
+
 		provider.workspaceBrowse = {
 			browsePath: [],
 			compilerArgs: [],
@@ -2273,6 +2360,7 @@ export async function loadConfigurationFromCache(
 						"Configuring from cache",
 					),
 				});
+
 				logger.message(
 					localize(
 						"configuring.from.cache",
@@ -2291,6 +2379,7 @@ export async function loadConfigurationFromCache(
 						fileIndex: [],
 					},
 				};
+
 				configurationCache = JSON.parse(content);
 
 				// Trick to get proper URIs after reading from the cache.
@@ -2310,6 +2399,7 @@ export async function loadConfigurationFromCache(
 					configuration.setBuildTargets(
 						configurationCache.buildTargets,
 					);
+
 					configuration.setLaunchTargets(
 						configurationCache.launchTargets,
 					);
@@ -2339,6 +2429,7 @@ export async function loadConfigurationFromCache(
 						"An error occured while parsing the configuration cache.",
 					),
 				);
+
 				logger.message(
 					localize(
 						"running.clean.configure.instead",
@@ -2352,6 +2443,7 @@ export async function loadConfigurationFromCache(
 			}
 
 			elapsedTime = util.elapsedTimeSince(startTime);
+
 			logger.message(
 				localize(
 					"load.configuration.from.cache.elapsed",
@@ -2473,6 +2565,7 @@ export async function doConfigure(
 			parseContent || "",
 			recursiveDoConfigure,
 		);
+
 	subphaseStats.preprocessParseContent = {
 		retc: preprocessedDryrunOutputResult.retc,
 		elapsed: preprocessedDryrunOutputResult.retc,
@@ -2483,6 +2576,7 @@ export async function doConfigure(
 	} else {
 		return subphaseStats;
 	}
+
 	logger.message(
 		localize(
 			"preprocess.elapsed.time",
@@ -2497,6 +2591,7 @@ export async function doConfigure(
 	logger.message(
 		localize("parsing.for.intellisense", "Parsing for IntelliSense."),
 	);
+
 	subphaseStats.parseIntelliSense = await updateProvider(
 		progress,
 		cancel,
@@ -2510,6 +2605,7 @@ export async function doConfigure(
 	) {
 		return subphaseStats;
 	}
+
 	logger.message(
 		localize(
 			"parsing.for.intellisense.elapsed",
@@ -2523,6 +2619,7 @@ export async function doConfigure(
 	logger.message(
 		localize("parsing.for.launch.targets", "Parsing for launch targets."),
 	);
+
 	subphaseStats.parseLaunch = await parseLaunchConfigurations(
 		progress,
 		cancel,
@@ -2536,6 +2633,7 @@ export async function doConfigure(
 	) {
 		return subphaseStats;
 	}
+
 	logger.message(
 		localize(
 			"parsing.for.launch.targets.elapsed",
@@ -2571,6 +2669,7 @@ export async function doConfigure(
 				currentLaunchConfigurationStr,
 			),
 		);
+
 		await configuration.setLaunchConfigurationByName("");
 	}
 
@@ -2591,6 +2690,7 @@ export async function doConfigure(
 				"Generating parse content for build targets.",
 			),
 		);
+
 		subphaseStats.dryrunTargets = await generateParseContent(
 			progress,
 			cancel,
@@ -2612,6 +2712,7 @@ export async function doConfigure(
 				parseFile,
 			),
 		);
+
 		subphaseStats.parseTargets = await parseTargets(
 			progress,
 			cancel,
@@ -2625,6 +2726,7 @@ export async function doConfigure(
 		) {
 			return subphaseStats;
 		}
+
 		logger.message(
 			localize(
 				"parsing.build.targets.elapsed.time",
@@ -2670,12 +2772,14 @@ export async function doConfigure(
 			// There can be only one level of recursivity because once the target is reset to empty,
 			// it is impossible to get into the state of having a target that is not found in the available list.
 			await configuration.setTargetByName("");
+
 			logger.message(
 				localize(
 					"automatically.reconfiguring.project.after.build.target.change",
 					"Automatically reconfiguring the project after a build target change.",
 				),
 			);
+
 			recursiveDoConfigure = true;
 
 			// This one level recursive doConfigure will keep the same clean state as the caller
@@ -2701,10 +2805,12 @@ export async function doConfigure(
 
 		let subphases: ConfigureSubphaseStatusItem[] =
 			getRelevantConfigStats(subphaseStats);
+
 		subphases.forEach((subphase) => {
 			const returnCode = localize("return.code", "return code");
 
 			const elapsedTime = localize("elapsed.time", "elapsed time");
+
 			logger.message(
 				`${subphase.name}: ${returnCode} = ${subphase.status.retc}, ` +
 					`${elapsedTime} = ${subphase.status.elapsed}`,

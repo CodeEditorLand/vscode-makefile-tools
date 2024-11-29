@@ -36,6 +36,7 @@ export let extension: MakefileToolsExtension;
 
 export class MakefileToolsExtension {
 	public readonly _projectOutlineProvider = new tree.ProjectOutlineProvider();
+
 	private readonly _projectOutlineTreeView = vscode.window.createTreeView(
 		"makefile.outline",
 		{
@@ -46,13 +47,17 @@ export class MakefileToolsExtension {
 
 	private readonly cppConfigurationProvider =
 		new cpptools.CppConfigurationProvider();
+
 	public getCppConfigurationProvider(): cpptools.CppConfigurationProvider {
 		return this.cppConfigurationProvider;
 	}
 
 	private mementoState = new state.StateManager(this.extensionContext);
+
 	private cppToolsAPI?: cpp.CppToolsApi;
+
 	private cppConfigurationProviderRegister?: Promise<void>;
+
 	private compilerFullPath?: string;
 
 	public constructor(
@@ -88,32 +93,39 @@ export class MakefileToolsExtension {
 	}
 
 	private fullFeatureSet: boolean = false;
+
 	public getFullFeatureSet(): boolean {
 		return this.fullFeatureSet;
 	}
+
 	public async setFullFeatureSet(newValue: boolean): Promise<void> {
 		await vscode.commands.executeCommand(
 			"setContext",
 			"makefile:fullFeatureSet",
 			newValue,
 		);
+
 		this.fullFeatureSet = newValue;
 	}
 
 	// Used for calling cppToolsAPI.notifyReady only once in a VSCode session.
 	private ranNotifyReadyInSession: boolean = false;
+
 	public getRanNotifyReadyInSession(): boolean {
 		return this.ranNotifyReadyInSession;
 	}
+
 	public setRanNotifyReadyInSession(ran: boolean): void {
 		this.ranNotifyReadyInSession = ran;
 	}
 
 	// Similar to state.ranConfigureInCodebaseLifetime, but at the scope of a VSCode session
 	private completedConfigureInSession: boolean = false;
+
 	public getCompletedConfigureInSession(): boolean | undefined {
 		return this.completedConfigureInSession;
 	}
+
 	public setCompletedConfigureInSession(completed: boolean): void {
 		this.completedConfigureInSession = completed;
 	}
@@ -133,6 +145,7 @@ export class MakefileToolsExtension {
 		if (this.cppToolsAPI) {
 			if (!this.ranNotifyReadyInSession && this.cppToolsAPI.notifyReady) {
 				this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
+
 				this.setRanNotifyReadyInSession(true);
 			}
 		}
@@ -175,6 +188,7 @@ export class MakefileToolsExtension {
 	}
 
 	private cummulativeBrowsePath: string[] = [];
+
 	public clearCummulativeBrowsePath(): void {
 		this.cummulativeBrowsePath = [];
 	}
@@ -224,6 +238,7 @@ export class MakefileToolsExtension {
 				),
 				sourceFileConfigurationItem,
 			);
+
 			extension
 				.getCppConfigurationProvider()
 				.logConfigurationProviderItem(sourceFileConfigurationItem);
@@ -283,8 +298,11 @@ export async function activate(
 	}
 
 	statusBar = ui.getUI();
+
 	extension = new MakefileToolsExtension(context);
+
 	configuration.disableAllOptionallyVisibleCommands();
+
 	await extension.setFullFeatureSet(false);
 
 	telemetry.activate();
@@ -484,6 +502,7 @@ export async function activate(
 			"makefile.resetState",
 			(reload?: boolean) => {
 				telemetry.logEvent("commandResetState");
+
 				extension.getState().reset(reload);
 			},
 		),
@@ -586,6 +605,7 @@ export async function activate(
 	// Read from the workspace state before reading from settings,
 	// becase the latter may use state info in variable expansion.
 	configuration.initFromState();
+
 	await configuration.initFromSettings(true);
 
 	const openSettings = async (setting: string) => {
@@ -593,6 +613,7 @@ export async function activate(
 			"workbench.action.openSettings",
 			setting,
 		);
+
 		await vscode.commands.executeCommand(
 			"workbench.action.openWorkspaceSettings",
 		);
@@ -600,6 +621,7 @@ export async function activate(
 
 	const openFile = async (fileUri: vscode.Uri) => {
 		await vscode.commands.executeCommand("vscode.open", fileUri);
+
 		await vscode.commands.executeCommand(
 			"workbench.files.action.showActiveFileInExplorer",
 		);
@@ -625,6 +647,7 @@ export async function activate(
 						await openFile(vscode.Uri.file(makefile));
 					} else {
 						extension.updateMakefileFilePresent(false);
+
 						vscode.window.showErrorMessage(
 							localize(
 								"makefile.outline.makefileFileNotFound",
@@ -666,6 +689,7 @@ export async function activate(
 						await openFile(vscode.Uri.file(buildLog));
 					} else {
 						extension.updateBuildLogPresent(false);
+
 						vscode.window.showErrorMessage(
 							localize(
 								"makefile.outline.buildLogFileNotFound",
@@ -748,6 +772,7 @@ export async function activate(
 					launch
 						.getLauncher()
 						.prepareDebugCurrentTarget(launchConfiguration);
+
 					launch.getLauncher().prepareRunCurrentTarget();
 				},
 			),
@@ -769,11 +794,15 @@ export async function activate(
 					await configuration.setCurrentLaunchConfiguration(
 						undefined,
 					);
+
 					await configuration.setCurrentMakefileConfiguration(
 						"Default",
 					);
+
 					configuration.setCurrentTarget(undefined);
+
 					configuration.initFromState();
+
 					await configuration.initFromSettings();
 				},
 			),
@@ -815,6 +844,7 @@ export async function activate(
 
 				doConfigure: boolean;
 			}
+
 			vscode.window
 				.showInformationMessage<Choice1>(
 					localize(
@@ -829,6 +859,7 @@ export async function activate(
 					if (!chosen) {
 						// User cancelled, they don't want to configure.
 						shouldConfigure = false;
+
 						telemetry.logConfigureOnOpenTelemetry(false);
 					} else {
 						// ask them if they always want to configure on open.
@@ -855,8 +886,10 @@ export async function activate(
 										"Not for this workspace",
 									),
 								];
+
 						interface Choice2 {
 							title: string;
+
 							persistMode: telemetry.ConfigureOnOpenScope;
 						}
 
@@ -890,6 +923,7 @@ export async function activate(
 									configTarget =
 										vscode.ConfigurationTarget.Workspace;
 								}
+
 								const workspaceFolder =
 									vscode.workspace.workspaceFolders?.[0];
 

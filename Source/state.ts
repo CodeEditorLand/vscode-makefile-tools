@@ -22,6 +22,7 @@ export class StateManager {
 	get buildConfiguration(): string | undefined {
 		return this._get<string>("buildConfiguration");
 	}
+
 	set buildConfiguration(v: string | undefined) {
 		this._update("buildConfiguration", v);
 	}
@@ -30,6 +31,7 @@ export class StateManager {
 	get buildTarget(): string | undefined {
 		return this._get<string>("buildTarget");
 	}
+
 	set buildTarget(v: string | undefined) {
 		this._update("buildTarget", v);
 	}
@@ -38,6 +40,7 @@ export class StateManager {
 	get launchConfiguration(): string | undefined {
 		return this._get<string>("launchConfiguration");
 	}
+
 	set launchConfiguration(v: string | undefined) {
 		this._update("launchConfiguration", v);
 	}
@@ -49,6 +52,7 @@ export class StateManager {
 	get ranConfigureInCodebaseLifetime(): boolean {
 		return this._get<boolean>("ranConfigureInCodebaseLifetime") || false;
 	}
+
 	set ranConfigureInCodebaseLifetime(v: boolean) {
 		this._update("ranConfigureInCodebaseLifetime", v);
 	}
@@ -66,6 +70,7 @@ export class StateManager {
 
 		return dirty;
 	}
+
 	set configureDirty(v: boolean) {
 		this._update("configureDirty", v);
 	}
@@ -73,9 +78,13 @@ export class StateManager {
 	// Reset all the variables saved in the workspace state.
 	reset(reloadWindow: boolean = true): void {
 		this.buildConfiguration = undefined;
+
 		this.buildTarget = undefined;
+
 		this.launchConfiguration = undefined;
+
 		this.ranConfigureInCodebaseLifetime = false;
+
 		this.configureDirty = false;
 
 		if (reloadWindow) {

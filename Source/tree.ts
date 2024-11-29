@@ -24,13 +24,16 @@ interface NamedItem {
 
 abstract class BaseNode {
 	constructor(public readonly id: string) {}
+
 	abstract getTreeItem(): vscode.TreeItem;
+
 	abstract getChildren(): BaseNode[];
 }
 
 export class BuildTargetNode extends BaseNode {
 	constructor(targetName: string) {
 		super(`buildTarget:${targetName}`);
+
 		this._name = targetName;
 	}
 
@@ -51,11 +54,14 @@ export class BuildTargetNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._name);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = localize(
 				"makefile.target.currently.selected.for.build",
 				"The makefile target currently selected for build.",
 			);
+
 			item.contextValue = [`nodeType=buildTarget`].join(",");
 
 			return item;
@@ -128,11 +134,14 @@ export class LaunchTargetNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._name);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = localize(
 				"launch.target.currently.selected.for.debug.run.in.terminal",
 				"The launch target currently selected for debug and run in terminal.",
 			);
+
 			item.contextValue = [`nodeType=launchTarget`].join(",");
 
 			return item;
@@ -151,6 +160,7 @@ export class LaunchTargetNode extends BaseNode {
 export class ConfigurationNode extends BaseNode {
 	constructor(configurationName: string) {
 		super(`configuration:${configurationName}`);
+
 		this._name = configurationName;
 	}
 
@@ -171,11 +181,14 @@ export class ConfigurationNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._name);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = localize(
 				"makefile.currently.selected.configuration",
 				"The makefile configuration currently selected from settings ('makefile.configurations').",
 			);
+
 			item.contextValue = [`nodeType=configuration`].join(",");
 
 			return item;
@@ -194,11 +207,14 @@ export class ConfigurationNode extends BaseNode {
 export class MakefilePathInfoNode extends BaseNode {
 	constructor(pathInSettings: string, pathDisplayed: string) {
 		super(pathDisplayed);
+
 		this._title = pathDisplayed;
+
 		this._tooltip = pathInSettings;
 	}
 
 	_title: string;
+
 	_tooltip: string;
 
 	update(pathInSettings: string, pathDisplayed: string): void {
@@ -207,6 +223,7 @@ export class MakefilePathInfoNode extends BaseNode {
 			"{0}",
 			`${pathDisplayed}`,
 		);
+
 		this._tooltip = pathInSettings;
 	}
 
@@ -217,8 +234,11 @@ export class MakefilePathInfoNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._title);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = this._tooltip;
+
 			item.contextValue = [`nodeType=makefilePathInfo`].join(",");
 
 			return item;
@@ -237,11 +257,14 @@ export class MakefilePathInfoNode extends BaseNode {
 export class MakePathInfoNode extends BaseNode {
 	constructor(pathInSettings: string, pathDisplayed: string) {
 		super(pathDisplayed);
+
 		this._title = pathDisplayed;
+
 		this._tooltip = pathInSettings;
 	}
 
 	_title: string;
+
 	_tooltip: string;
 
 	update(pathInSettings: string, pathDisplayed: string): void {
@@ -250,6 +273,7 @@ export class MakePathInfoNode extends BaseNode {
 			"{0}",
 			`${pathDisplayed}`,
 		);
+
 		this._tooltip = pathInSettings;
 	}
 
@@ -260,8 +284,11 @@ export class MakePathInfoNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._title);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = this._tooltip;
+
 			item.contextValue = [`nodeType=makePathInfo`].join(",");
 
 			return item;
@@ -280,6 +307,7 @@ export class MakePathInfoNode extends BaseNode {
 export class BuildLogPathInfoNode extends BaseNode {
 	constructor(pathInSettings: string, pathDisplayed: string) {
 		super(pathDisplayed);
+
 		this._title = pathDisplayed;
 	}
 
@@ -300,11 +328,14 @@ export class BuildLogPathInfoNode extends BaseNode {
 	getTreeItem(): vscode.TreeItem {
 		try {
 			const item: vscode.TreeItem = new vscode.TreeItem(this._title);
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			item.tooltip = localize(
 				"build.log.path.info",
 				"The path to the build log that is read to bypass a dry-run.",
 			);
+
 			item.contextValue = [`nodeType=buildLogPathInfo`].join(",");
 
 			return item;
@@ -324,22 +355,28 @@ export class ProjectOutlineProvider
 	implements vscode.TreeDataProvider<BaseNode>
 {
 	private readonly _changeEvent = new vscode.EventEmitter<BaseNode | null>();
+
 	private readonly _unsetString = localize("Unset", "Unset");
 
 	constructor() {
 		this._currentConfigurationItem = new ConfigurationNode(
 			this._unsetString,
 		);
+
 		this._currentBuildTargetItem = new BuildTargetNode(this._unsetString);
+
 		this._currentLaunchTargetItem = new LaunchTargetNode(this._unsetString);
+
 		this._currentMakefilePathInfoItem = new MakefilePathInfoNode(
 			this._unsetString,
 			"",
 		);
+
 		this._currentMakePathInfoItem = new MakePathInfoNode(
 			this._unsetString,
 			"",
 		);
+
 		this._currentBuildLogPathInfoItem = new BuildLogPathInfoNode(
 			this._unsetString,
 			"",
@@ -347,22 +384,30 @@ export class ProjectOutlineProvider
 	}
 
 	private _currentConfigurationItem: ConfigurationNode;
+
 	private _currentBuildTargetItem: BuildTargetNode;
+
 	private _currentLaunchTargetItem: LaunchTargetNode;
+
 	private _currentMakefilePathInfoItem: MakefilePathInfoNode;
+
 	private _currentMakePathInfoItem: MakePathInfoNode;
+
 	private _currentBuildLogPathInfoItem: BuildLogPathInfoNode;
 
 	get onDidChangeTreeData(): any {
 		return this._changeEvent.event;
 	}
+
 	async getTreeItem(node: BaseNode): Promise<vscode.TreeItem> {
 		return node.getTreeItem();
 	}
+
 	getChildren(node?: BaseNode): BaseNode[] {
 		if (node) {
 			return node.getChildren();
 		}
+
 		if (
 			configuration.isOptionalFeatureEnabled("debug") ||
 			configuration.isOptionalFeatureEnabled("run")
@@ -395,10 +440,12 @@ export class ProjectOutlineProvider
 		if (!pathInSettings) {
 			if (kind === "Build Log") {
 				extension.updateBuildLogPresent(false);
+
 				kind = localize("build.log", "Build Log");
 			} else if (kind === "Makefile") {
 				extension.updateMakefileFilePresent(false);
 			}
+
 			const unset = localize("Unset", "Unset");
 
 			return `${kind}: [${unset}]`;
@@ -426,6 +473,7 @@ export class ProjectOutlineProvider
 
 		if (kind === "Build Log") {
 			extension.updateBuildLogPresent(checkFileExists);
+
 			kind = localize("build.log", "Build Log");
 		} else if (kind === "Makefile") {
 			extension.updateMakefileFilePresent(checkFileExists);
@@ -454,18 +502,23 @@ export class ProjectOutlineProvider
 		this._currentConfigurationItem.update(
 			configuration || this._unsetString,
 		);
+
 		this._currentBuildTargetItem.update(buildTarget || this._unsetString);
+
 		await this._currentLaunchTargetItem.update(
 			launchTarget || this._unsetString,
 		);
+
 		this._currentMakefilePathInfoItem.update(
 			makefilePathInfo || this._unsetString,
 			this.pathDisplayed(makefilePathInfo, "Makefile", false, false),
 		);
+
 		this._currentMakePathInfoItem.update(
 			makePathInfo || this._unsetString,
 			this.pathDisplayed(makePathInfo, "Make", true, false),
 		);
+
 		this._currentBuildLogPathInfoItem.update(
 			buildLogInfo || this._unsetString,
 			this.pathDisplayed(buildLogInfo, "Build Log", false, false),
@@ -476,16 +529,19 @@ export class ProjectOutlineProvider
 
 	updateConfiguration(configuration: string): void {
 		this._currentConfigurationItem.update(configuration);
+
 		this.updateTree();
 	}
 
 	updateBuildTarget(buildTarget: string): void {
 		this._currentBuildTargetItem.update(buildTarget);
+
 		this.updateTree();
 	}
 
 	async updateLaunchTarget(launchTarget: string): Promise<void> {
 		await this._currentLaunchTargetItem.update(launchTarget);
+
 		this.updateTree();
 	}
 
@@ -496,6 +552,7 @@ export class ProjectOutlineProvider
 			makefilePathInfo || this._unsetString,
 			this.pathDisplayed(makefilePathInfo, "Makefile", false, true),
 		);
+
 		this.updateTree();
 	}
 
@@ -504,6 +561,7 @@ export class ProjectOutlineProvider
 			makePathInfo || this._unsetString,
 			this.pathDisplayed(makePathInfo, "Make", true, false),
 		);
+
 		this.updateTree();
 	}
 
@@ -514,6 +572,7 @@ export class ProjectOutlineProvider
 			buildLogPathInfo || this._unsetString,
 			this.pathDisplayed(buildLogPathInfo, "Build Log", false, true),
 		);
+
 		this.updateTree();
 	}
 

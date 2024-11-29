@@ -28,6 +28,7 @@ export interface SourceFileConfigurationItem
 
 export interface CustomConfigurationProvider {
 	workspaceBrowse: cpp.WorkspaceBrowseConfiguration;
+
 	fileIndex: Map<string, SourceFileConfigurationItem>;
 }
 
@@ -35,6 +36,7 @@ export class CppConfigurationProvider
 	implements cpp.CustomConfigurationProvider
 {
 	public readonly name = "Makefile Tools";
+
 	public readonly extensionId = "ms-vscode.makefile-tools";
 
 	private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = {
@@ -60,6 +62,7 @@ export class CppConfigurationProvider
 			sourceFileConfiguration = make
 				.getDeltaCustomConfigurationProvider()
 				.fileIndex.get(norm_path);
+
 			logger.message(
 				localize(
 					"configuration.for.file.not.found",
@@ -107,6 +110,7 @@ export class CppConfigurationProvider
 		provider: CustomConfigurationProvider,
 	): void {
 		this.fileIndex = provider.fileIndex;
+
 		this.workspaceBrowseConfiguration = provider.workspaceBrowse;
 	}
 
@@ -117,6 +121,7 @@ export class CppConfigurationProvider
 	): void {
 		if (make.getConfigureIsClean()) {
 			this.fileIndex.clear();
+
 			this.workspaceBrowseConfiguration = {
 				browsePath: [],
 				compilerArgs: [],
@@ -127,6 +132,7 @@ export class CppConfigurationProvider
 		}
 
 		let map: Map<string, SourceFileConfigurationItem> = this.fileIndex;
+
 		provider.fileIndex.forEach(function (value, key): void {
 			map.set(key, value);
 		});
@@ -173,6 +179,7 @@ export class CppConfigurationProvider
 	public async provideBrowseConfiguration(): Promise<cpp.WorkspaceBrowseConfiguration> {
 		return this.workspaceBrowseConfiguration;
 	}
+
 	public setBrowseConfiguration(
 		browseConfiguration: cpp.WorkspaceBrowseConfiguration,
 	): void {
@@ -191,6 +198,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"browse.path",
@@ -199,6 +207,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"standard",
@@ -207,6 +216,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"compiler.path",
@@ -215,6 +225,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"compiler.arguments",
@@ -237,6 +248,7 @@ export class CppConfigurationProvider
 				"Verbose",
 			);
 		}
+
 		logger.message(
 			"----------------------------------------------------------------------------",
 			"Verbose",
@@ -260,10 +272,12 @@ export class CppConfigurationProvider
 			"Sending configuration for file {0} -----------------------------------",
 			uriObj.fsPath,
 		);
+
 		logger.message(
 			fromCache ? fromCacheString : notFromCacheString,
 			"Normal",
 		);
+
 		logger.message(
 			localize(
 				"defines",
@@ -272,6 +286,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"include.path",
@@ -291,6 +306,7 @@ export class CppConfigurationProvider
 				"Verbose",
 			);
 		}
+
 		logger.message(
 			localize(
 				"standard.2",
@@ -299,6 +315,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"intellisense.mode",
@@ -307,6 +324,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"compiler.path",
@@ -315,6 +333,7 @@ export class CppConfigurationProvider
 			),
 			"Verbose",
 		);
+
 		logger.message(
 			localize(
 				"compiler.args.2",
@@ -337,6 +356,7 @@ export class CppConfigurationProvider
 				"Verbose",
 			);
 		}
+
 		logger.message(
 			"---------------------------------------------------------------------------------------------------",
 			"Verbose",

@@ -81,11 +81,15 @@ export async function parseTargets(
 	// There can be more than one matching section.
 	let regexpExtract: RegExp =
 		/(# Files\n*)([\s\S]*?)(\n# Finished Make data base)/gm;
+
 	let result: RegExpExecArray | null;
+
 	let extractedLog: string = "";
 
 	let matches: string[] = [];
+
 	let match: string[] | null;
+
 	result = await util.scheduleTask(() => regexpExtract.exec(verboseLog));
 
 	while (result) {
@@ -101,12 +105,14 @@ export async function parseTargets(
 			regexpTargetStr +=
 				".*\\s+(?=#  Phony target \\(prerequisite of \\.PHONY\\)\\.)";
 		}
+
 		let regexpTarget: RegExp = RegExp(regexpTargetStr, "mg");
 
 		match = regexpTarget.exec(extractedLog);
 
 		if (match) {
 			let done: boolean = false;
+
 			let doParsingChunk: () => void = () => {
 				let chunkIndex: number = 0;
 
@@ -117,10 +123,12 @@ export async function parseTargets(
 					// which is the pattern parsed here.
 					if (!matches.includes(match[1])) {
 						matches.push(match[1]);
+
 						foundTargetCallback(match[1]);
 					}
 
 					statusCallback("Parsing build targets...");
+
 					match = regexpTarget.exec(extractedLog);
 
 					if (!match) {
@@ -130,6 +138,7 @@ export async function parseTargets(
 					chunkIndex++;
 				}
 			};
+
 			while (!done) {
 				if (cancel.isCancellationRequested) {
 					return make.ConfigureBuildReturnCodeTypes.cancelled;
@@ -149,7 +158,9 @@ export async function parseTargets(
 
 export interface PreprocessDryRunOutputReturnType {
 	retc: number;
+
 	elapsed: number;
+
 	result?: string;
 }
 
@@ -170,6 +181,7 @@ export async function preprocessDryRunOutput(
 	}
 
 	let startTime: number = Date.now();
+
 	statusCallback("Preprocessing the dry-run output");
 
 	// Array of tasks required to be executed during the preprocess configure phase
@@ -184,6 +196,7 @@ export async function preprocessDryRunOutput(
 	preprocessTasks.push(function (): void {
 		if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
 			let extensionRootPath: string = path.resolve(__dirname, "../");
+
 			preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
 				/{REPO:VSCODE-MAKEFILE-TOOLS}/gm,
 				extensionRootPath,
@@ -195,6 +208,7 @@ export async function preprocessDryRunOutput(
 	// At the end of every intermediate line is at least a space, then a \ and end of line.
 	// Concatenate all these lines to see clearly each command on one line.
 	let regexp: RegExp = /(\\$\n)|(\\\\$\n)/gm;
+
 	preprocessTasks.push(function (): void {
 		preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
 			regexp,
@@ -216,6 +230,7 @@ export async function preprocessDryRunOutput(
 	// libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
 	preprocessTasks.push(function (): void {
 		regexp = /libtool: compile:|libtool: link:/gm;
+
 		preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
 			regexp,
 			"\nLIBTOOL_PATTERN\n",
@@ -228,6 +243,7 @@ export async function preprocessDryRunOutput(
 	// Replace these patterns with end of line so that the parser will see only the right half.
 	preprocessTasks.push(function (): void {
 		regexp = /--mode=compile|--mode=link/gm;
+
 		preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
 			regexp,
 			"\nLIBTOOL_PATTERN\n",
@@ -290,6 +306,7 @@ export async function preprocessDryRunOutput(
 	// and so that we have a similar view of the preprocessed text.
 	preprocessTasks.push(function (): void {
 		regexp = /------/gm;
+
 		preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
 			regexp,
 			"- - - - - - ",
@@ -358,12 +375,15 @@ async function parseLineAsTool(
 	// in their names, include a crafted regex around each tool name.
 	// Any number of prefix or suffix text, separated by '-'.
 	let versionedToolNames: string[] = [];
+
 	const prefixRegex: string = isCompilerOrLinker
 		? "(([a-zA-Z0-9-_.]*-)*"
 		: "";
+
 	const suffixRegex: string = isCompilerOrLinker
 		? "(-[a-zA-Z0-9-_.]*)*)"
 		: "";
+
 	toolNames.forEach((tool) => {
 		// Check if the user defined this tool as to be excluded
 		if (!configuration.getExcludeCompilerNames()?.includes(tool)) {
@@ -390,6 +410,7 @@ async function parseLineAsTool(
 	// - with or without quotes
 	// - must have at least one space or tab after the tool invocation
 	let regexpStr: string = '^[\\s\\"]*(.*?)(';
+
 	if (process.platform === "win32") {
 		regexpStr += versionedToolNames.join("\\.exe|");
 
@@ -404,6 +425,7 @@ async function parseLineAsTool(
 	regexpStr += versionedToolNames.join("|") + ')(\\s|\\"\\s)(.*)$';
 
 	let regexp: RegExp = RegExp(regexpStr, "mg");
+
 	let match: RegExpExecArray | null = regexp.exec(line);
 
 	if (!match) {
@@ -411,7 +433,9 @@ async function parseLineAsTool(
 	}
 
 	let toolPathInMakefile: string = match[1];
+
 	let toolNameInMakefile: string = match[2];
+
 	if (process.platform === "win32" && !path.extname(toolNameInMakefile)) {
 		toolNameInMakefile += ".exe";
 	}
@@ -420,13 +444,16 @@ async function parseLineAsTool(
 	// checkFileExists works just fine without quotes,
 	// but makeFullPath gets confused sometimes for some quotes scenarios.
 	currentPath = util.removeQuotes(currentPath);
+
 	toolPathInMakefile = toolPathInMakefile.trimLeft();
+
 	toolPathInMakefile = util.removeQuotes(toolPathInMakefile);
 
 	let toolFullPath: string = await util.makeFullPath(
 		toolPathInMakefile + toolNameInMakefile,
 		currentPath,
 	);
+
 	let toolFound: boolean = util.checkFileExistsSync(toolFullPath);
 
 	// Reject a regexp match that doesn't have a real path before the tool invocation,
@@ -471,16 +498,22 @@ async function parseAnySwitchFromToolArguments(
 	// Identify the non value part of the switch: prefix, switch name
 	// and what may separate this from an eventual switch value
 	let switches: string[] = [];
+
 	let regExpStr: string =
 		"(^|\\s+)(--|-" +
 		// On Win32 allow '/' as switch prefix as well,
 		// otherwise it conflicts with path character
 		(process.platform === "win32" ? "|\\/" : "") +
 		")([a-zA-Z0-9_]+)";
+
 	let regexp: RegExp = RegExp(regExpStr, "mg");
+
 	let match1: RegExpExecArray | null;
+
 	let match2: RegExpExecArray | null;
+
 	let index1: number = -1;
+
 	let index2: number = -1;
 
 	// This contains all the compilation command fragments in between two different consecutive switches
@@ -523,6 +556,7 @@ async function parseAnySwitchFromToolArguments(
 		let partialArgs: string = args.substring(index1, index2);
 
 		let swi: string = match1[3];
+
 		swi = swi.trim();
 
 		// Skip over any switches that we know we don't need
@@ -558,6 +592,7 @@ async function parseAnySwitchFromToolArguments(
 			/\,/gm,
 			"DONT_USE_COMMA_AS_SEPARATOR",
 		);
+
 		compilerArgRegions = compilerArgRegions.replace(
 			/\=/gm,
 			"DONT_USE_EQUAL_AS_SEPARATOR",
@@ -565,16 +600,22 @@ async function parseAnySwitchFromToolArguments(
 	}
 
 	let scriptArgs: string[] = [];
+
 	let runCommand: string;
+
 	if (process.platform === "win32") {
 		runCommand = "cmd";
+
 		scriptArgs.push("/c");
+
 		scriptArgs.push(
 			`""${parseCompilerArgsScriptFile}" ${compilerArgRegions}"`,
 		);
 	} else {
 		runCommand = "/bin/bash";
+
 		scriptArgs.push("-c");
+
 		scriptArgs.push(
 			`"source '${parseCompilerArgsScriptFile}' ${compilerArgRegions}"`,
 		);
@@ -585,8 +626,10 @@ async function parseAnySwitchFromToolArguments(
 			if (process.platform === "win32") {
 				// Restore the commas and equals that were hidden from the script invocation.
 				result = result.replace(/DONT_USE_COMMA_AS_SEPARATOR/gm, ",");
+
 				result = result.replace(/DONT_USE_EQUAL_AS_SEPARATOR/gm, "=");
 			}
+
 			let results: string[] = result.replace(/\r\n/gm, "\n").split("\n");
 			// In case of concatenated separators, the shell sees different empty arguments
 			// which we can remove (most common is more spaces not being seen as a single space).
@@ -767,11 +810,15 @@ function parseMultipleSwitchFromToolArguments(
 		mainPattern(false) +
 		")" + // switch if not fully quoted
 		")";
+
 	let regexp: RegExp = RegExp(regexpStr, "mg");
+
 	let match: RegExpExecArray | null;
+
 	let results: string[] = [];
 
 	match = regexp.exec(args);
+
 	while (match) {
 		let matchIndex: number =
 			match[2].startsWith("'") && match[2].endsWith("'") ? 8 : 26;
@@ -782,8 +829,10 @@ function parseMultipleSwitchFromToolArguments(
 			if (removeSurroundingQuotes) {
 				result = util.removeSurroundingQuotes(result);
 			}
+
 			results.push(result);
 		}
+
 		match = regexp.exec(args);
 	}
 
@@ -815,6 +864,7 @@ function parseMultipleSwitchesFromToolArguments(
 	// - the value can be wrapped by a pair of "
 	// - one or none or more spaces/tabs between the switch and the value
 	let regexpStr: string = "(^|\\s+)\\'?(";
+
 	valueSwitches.forEach((sw) => {
 		regexpStr +=
 			"\\/" +
@@ -829,15 +879,21 @@ function parseMultipleSwitchesFromToolArguments(
 			regexpStr += "|";
 		}
 	});
+
 	regexpStr += ')(\\".*?\\"|[^\\\'\\s]+)';
+
 	regexpStr += "|((\\/|-|--)(" + simpleSwitches.join("|") + "))";
+
 	regexpStr += "\\'?";
 
 	let regexp: RegExp = RegExp(regexpStr, "mg");
+
 	let match: RegExpExecArray | null;
+
 	let results: string[] = [];
 
 	match = regexp.exec(args);
+
 	while (match) {
 		// If the current match is a simple switch, find it at index 15, otherwise at 12.
 		// In each scenario, only one will have a value while the other is undefined.
@@ -845,8 +901,10 @@ function parseMultipleSwitchesFromToolArguments(
 
 		if (result) {
 			result = result.trim();
+
 			results.push(result);
 		}
+
 		match = regexp.exec(args);
 	}
 
@@ -879,18 +937,24 @@ function parseSingleSwitchFromToolArguments(
 		"(^|\\s+)\\'?(\\/|-|--)(" +
 		sw.join("|") +
 		")(:|=|\\s*)(\\\".*?\\\"|[^\\'\\s]+)\\'?";
+
 	let regexp: RegExp = RegExp(regexpStr, "mg");
+
 	let match: RegExpExecArray | null;
+
 	let results: string[] = [];
 
 	match = regexp.exec(args);
+
 	while (match) {
 		let result: string = match[5];
 
 		if (result) {
 			result = result.trim();
+
 			results.push(result);
 		}
+
 		match = regexp.exec(args);
 	}
 
@@ -912,6 +976,7 @@ function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
 	// - one or more spaces/tabs after
 	let regexpStr: string =
 		"((\\s+)|^)(\\/|-|--)(" + sw.join("|") + ")((\\s+)|$)";
+
 	let regexp: RegExp = RegExp(regexpStr, "mg");
 
 	if (regexp.exec(args)) {
@@ -932,21 +997,27 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 	//    - if surrounding quotes, don't allow another quote in between
 	// (todo: handle the scenario when quotes enclose just the directory path, without the file name)
 	let regexpStr: string = "(";
+
 	exts.forEach((ext) => {
 		regexpStr += '\\".[^\\"]*?\\.' + ext + '\\"|';
+
 		regexpStr += "\\S+\\." + ext;
 		// Make sure we don't append '|' after the last extension value
 		if (ext !== exts[exts.length - 1]) {
 			regexpStr += "|";
 		}
 	});
+
 	regexpStr += ")(\\s+|$)";
 
 	let regexp: RegExp = RegExp(regexpStr, "mg");
+
 	let match: string[] | null;
+
 	let files: string[] = [];
 
 	match = regexp.exec(args);
+
 	while (match) {
 		let result: string = match[1];
 
@@ -966,6 +1037,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 		if (str === echo) {
 			// not to use util.removeQuotes because that also removes double quotes "
 			result = result.replace(/\'/gm, "");
+
 			result = result.replace(/\`/gm, "");
 		}
 
@@ -986,6 +1058,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 
 			files.push(result);
 		}
+
 		match = regexp.exec(args);
 	}
 
@@ -1000,12 +1073,14 @@ async function currentPathAfterCommand(
 	currentPathHistory: string[],
 ): Promise<string[]> {
 	line = line.trimLeft();
+
 	line = line.trimRight();
 
 	let lastCurrentPath: string =
 		currentPathHistory.length > 0
 			? currentPathHistory[currentPathHistory.length - 1]
 			: "";
+
 	let newCurrentPath: string = "";
 
 	const analyzeLine = localize("analyze.line", "Analyzing line: {0}", line);
@@ -1025,6 +1100,7 @@ async function currentPathAfterCommand(
 				: lastCurrentPath;
 
 		logger.message(analyzeLine, "Verbose");
+
 		logger.message(
 			localize(
 				"leaving.directory",
@@ -1034,7 +1110,9 @@ async function currentPathAfterCommand(
 			),
 			"Verbose",
 		);
+
 		currentPathHistory.push(lastCurrentPath);
+
 		currentPathHistory.push(lastCurrentPath2);
 	} else if (
 		(line.startsWith("popd") &&
@@ -1045,13 +1123,16 @@ async function currentPathAfterCommand(
 			currentPathHistory.length > 0
 				? currentPathHistory[currentPathHistory.length - 1]
 				: "";
+
 		currentPathHistory.pop();
 
 		let lastCurrentPath2: string =
 			currentPathHistory.length > 0
 				? currentPathHistory[currentPathHistory.length - 1]
 				: "";
+
 		logger.message(analyzeLine, "Verbose");
+
 		logger.message(
 			localize(
 				"popd.command",
@@ -1076,11 +1157,14 @@ async function currentPathAfterCommand(
 		// even if this wasn't a pushd.
 		if (currentPathHistory.length > 1) {
 			currentPathHistory = [];
+
 			currentPathHistory.push(lastCurrentPath);
 		}
 
 		currentPathHistory.push(newCurrentPath);
+
 		logger.message(analyzeLine, "Verbose");
+
 		logger.message(
 			localize(
 				"cd.command",
@@ -1097,8 +1181,11 @@ async function currentPathAfterCommand(
 			line.slice(6),
 			lastCurrentPath,
 		);
+
 		currentPathHistory.push(newCurrentPath);
+
 		logger.message(analyzeLine, "Verbose");
+
 		logger.message(
 			localize(
 				"pushd.command",
@@ -1122,6 +1209,7 @@ async function currentPathAfterCommand(
 		}
 
 		logger.message(analyzeLine, "Verbose");
+
 		logger.message(
 			localize(
 				"make.c.entering",
@@ -1130,6 +1218,7 @@ async function currentPathAfterCommand(
 			),
 			"Verbose",
 		);
+
 		currentPathHistory.push(newCurrentPath);
 	}
 
@@ -1140,23 +1229,37 @@ async function currentPathAfterCommand(
 // hosted here https://clang.llvm.org/docs/JSONCompilationDatabase.html
 export interface CompileCommand {
 	directory: string;
+
 	file: string;
+
 	command: string;
+
 	arguments?: string[];
+
 	output?: string;
 }
 
 export interface CustomConfigProviderItem {
 	defines: string[];
+
 	includes: string[];
+
 	forcedIncludes: string[];
+
 	standard?: util.StandardVersion;
+
 	intelliSenseMode?: util.IntelliSenseMode;
+
 	compilerFullPath: string;
+
 	compilerArgs: string[];
+
 	files: string[];
+
 	windowsSDKVersion?: string;
+
 	currentPath: string;
+
 	line: string;
 }
 
@@ -1188,14 +1291,19 @@ export async function parseCustomConfigProvider(
 	// Current path starts with workspace root and can be modified
 	// with prompt commands like cd, cd-, pushd/popd or with -C make switch
 	let currentPath: string = util.getWorkspaceRoot();
+
 	let currentPathHistory: string[] = [currentPath];
 
 	// Read the dry-run output line by line, searching for compilers and directory changing commands
 	// to construct information for the CppTools custom configuration
 	let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+
 	dryRunOutputLines = util.removeSplitUpParenthesis(dryRunOutputLines);
+
 	let numberOfLines: number = dryRunOutputLines.length;
+
 	let index: number = 0;
+
 	let done: boolean = false;
 
 	async function doParsingChunk(): Promise<void> {
@@ -1209,10 +1317,12 @@ export async function parseCustomConfigProvider(
 			let line: string = dryRunOutputLines[index];
 
 			statusCallback("Parsing for IntelliSense");
+
 			currentPathHistory = await currentPathAfterCommand(
 				line,
 				currentPathHistory,
 			);
+
 			currentPath = currentPathHistory[currentPathHistory.length - 1];
 
 			let compilerTool: ToolInvocation | undefined =
@@ -1225,6 +1335,7 @@ export async function parseCustomConfigProvider(
 				path.parse(compilerTool.pathInMakefile).name.endsWith("ccache")
 			) {
 				line = line.replace(`${compilerTool.pathInMakefile}`, "");
+
 				compilerTool = await parseLineAsTool(
 					line,
 					compilers,
@@ -1247,6 +1358,7 @@ export async function parseCustomConfigProvider(
 
 				if (!compilerTool.found) {
 					let toolBaseName: string = path.basename(compilerFullPath);
+
 					compilerFullPath = path.join(
 						util.toolPathInEnv(toolBaseName) || "",
 						toolBaseName,
@@ -1256,6 +1368,7 @@ export async function parseCustomConfigProvider(
 				// Exclude switches that are being processed separately (I, FI, include, D, std)
 				// and switches that don't affect IntelliSense but are causing errors.
 				let compilerArgs: string[] = [];
+
 				compilerArgs = await parseAnySwitchFromToolArguments(
 					compilerTool.arguments,
 					["I", "FI", "include", "D", "std", "MF"],
@@ -1266,6 +1379,7 @@ export async function parseCustomConfigProvider(
 					compilerTool.arguments,
 					"I",
 				);
+
 				includes = await util.makeFullPaths(includes, currentPath);
 
 				let forcedIncludes: string[] =
@@ -1315,6 +1429,7 @@ export async function parseCustomConfigProvider(
 					compilerTool.arguments,
 					sourceFileExtensions,
 				);
+
 				files = await util.makeFullPaths(files, currentPath);
 
 				// The language represented by this compilation command
@@ -1410,6 +1525,7 @@ export async function parseCustomConfigProvider(
 			} // if (compilerTool) {
 
 			index++;
+
 			if (index === numberOfLines) {
 				done = true;
 			}
@@ -1466,6 +1582,7 @@ export async function parseLaunchConfigurations(
 	// Current path starts with workspace root and can be modified
 	// with prompt commands like cd, cd-, pushd/popd or with -C make switch
 	let currentPath: string = util.getWorkspaceRoot();
+
 	let currentPathHistory: string[] = [currentPath];
 
 	// array of full path executables built by this makefile
@@ -1475,10 +1592,15 @@ export async function parseLaunchConfigurations(
 	// searching for compilers, linkers and directory changing commands
 	// to construct information for the launch configuration
 	let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+
 	dryRunOutputLines = util.removeSplitUpParenthesis(dryRunOutputLines);
+
 	let numberOfLines: number = dryRunOutputLines.length;
+
 	let index: number = 0;
+
 	let done: boolean = false;
+
 	let doLinkCommandsParsingChunk: () => Promise<void> = async () => {
 		let chunkIndex: number = 0;
 
@@ -1492,10 +1614,12 @@ export async function parseLaunchConfigurations(
 			statusCallback(
 				"Parsing for launch targets: inspecting for link commands",
 			);
+
 			currentPathHistory = await currentPathAfterCommand(
 				line,
 				currentPathHistory,
 			);
+
 			currentPath = currentPathHistory[currentPathHistory.length - 1];
 
 			// A target binary is usually produced by the linker with the /out or /o switch,
@@ -1503,6 +1627,7 @@ export async function parseLaunchConfigurations(
 			// when the compiler is producing an output binary directly (via the /Fe switch)
 			// or indirectly (based on some naming default rules in the absence of /Fe)
 			let linkerTargetBinary: string | undefined;
+
 			let compilerTargetBinary: string | undefined;
 
 			if (process.platform === "win32") {
@@ -1553,8 +1678,10 @@ export async function parseLaunchConfigurations(
 								if (objFile) {
 									let parsedObjPath: path.ParsedPath =
 										path.parse(objFile);
+
 									compilerTargetBinary =
 										parsedObjPath.name + ".exe";
+
 									logger.message(
 										localize(
 											"compiler.command.target.binary",
@@ -1588,8 +1715,10 @@ export async function parseLaunchConfigurations(
 								if (srcFiles.length >= 1) {
 									let parsedSourcePath: path.ParsedPath =
 										path.parse(srcFiles[0]);
+
 									compilerTargetBinary =
 										parsedSourcePath.name + ".exe";
+
 									logger.message(
 										localize(
 											"compiler.command.not.producing",
@@ -1617,6 +1746,7 @@ export async function parseLaunchConfigurations(
 				linkers,
 				currentPath,
 			);
+
 			if (linkerTool) {
 				// TODO: implement launch support for DLLs and LIBs, besides executables.
 				if (
@@ -1643,6 +1773,7 @@ export async function parseLaunchConfigurations(
 							linkerTool.arguments,
 							["out", "o"],
 						);
+
 						logger.message(
 							localize(
 								"found.linker.command",
@@ -1672,8 +1803,10 @@ export async function parseLaunchConfigurations(
 								if (files.length >= 1) {
 									let parsedPath: path.ParsedPath =
 										path.parse(files[0]);
+
 									let targetBinaryFromFirstObjLib: string =
 										parsedPath.name + ".exe";
+
 									logger.message(
 										localize(
 											"link.not.producing.explicitly",
@@ -1682,6 +1815,7 @@ export async function parseLaunchConfigurations(
 										),
 										"Verbose",
 									);
+
 									linkerTargetBinary =
 										targetBinaryFromFirstObjLib;
 								}
@@ -1695,6 +1829,7 @@ export async function parseLaunchConfigurations(
 									),
 									"Verbose",
 								);
+
 								linkerTargetBinary = "a.out";
 							}
 						}
@@ -1715,6 +1850,7 @@ export async function parseLaunchConfigurations(
 								util.removeSurroundingQuotes(
 									linkerTargetBinary,
 								);
+
 							logger.message(
 								localize(
 									"producing.target.binary",
@@ -1723,6 +1859,7 @@ export async function parseLaunchConfigurations(
 								),
 								"Verbose",
 							);
+
 							linkerTargetBinary = await util.makeFullPath(
 								linkerTargetBinary,
 								currentPath,
@@ -1769,10 +1906,12 @@ export async function parseLaunchConfigurations(
 					),
 					"Verbose",
 				);
+
 				onFoundLaunchConfiguration(launchConfiguration);
 			}
 
 			index++;
+
 			if (index === numberOfLines) {
 				done = true;
 			}
@@ -1812,6 +1951,7 @@ export async function parseLaunchConfigurations(
 	// with this second pass through the dry-run output lines,
 	// while building the launch custom provider data.
 	currentPath = util.getWorkspaceRoot();
+
 	currentPathHistory = [currentPath];
 
 	// Since an executable can be called without its extension,
@@ -1819,6 +1959,7 @@ export async function parseLaunchConfigurations(
 	// create a new array with target binaries names
 	// to ensure we parse right these binaries invocation right.
 	let targetBinariesNames: string[] = [];
+
 	targetBinaries.forEach((target) => {
 		let parsedPath: path.ParsedPath = path.parse(target);
 
@@ -1832,7 +1973,9 @@ export async function parseLaunchConfigurations(
 	});
 
 	index = 0;
+
 	done = false;
+
 	let doBinaryInvocationsParsingChunk: () => Promise<void> = async () => {
 		let chunkIndex: number = 0;
 
@@ -1850,10 +1993,12 @@ export async function parseLaunchConfigurations(
 				statusCallback(
 					"Parsing for launch targets: inspecting built binary invocations",
 				);
+
 				currentPathHistory = await currentPathAfterCommand(
 					line,
 					currentPathHistory,
 				);
+
 				currentPath = currentPathHistory[currentPathHistory.length - 1];
 
 				// Currently, the target binary invocation will not be identified if the line does not start with it,
@@ -1880,6 +2025,7 @@ export async function parseLaunchConfigurations(
 				// tools from the path during the build and we shouldn't launch those.
 				if (targetBinaryTool) {
 					let foundTargetBinary: boolean = false;
+
 					targetBinaries.forEach((target) => {
 						if (target === targetBinaryTool?.fullPath) {
 							foundTargetBinary = true;
@@ -1908,6 +2054,7 @@ export async function parseLaunchConfigurations(
 								[],
 							)
 						: [];
+
 					if (splitArgs.length > 0) {
 						splitArgs = filterTargetBinaryArgs(splitArgs);
 					}
@@ -1930,11 +2077,13 @@ export async function parseLaunchConfigurations(
 						),
 						"Verbose",
 					);
+
 					onFoundLaunchConfiguration(launchConfiguration);
 				}
 			}
 
 			index++;
+
 			if (index === numberOfLines) {
 				done = true;
 			}
@@ -1976,9 +2125,11 @@ function getIntelliSenseMode(
 
 	const canUseArm: boolean =
 		cppVersion !== undefined && cppVersion >= cpp.Version.v4;
+
 	const compilerName: string = path
 		.basename(compilerPath || "")
 		.toLocaleLowerCase();
+
 	if (compilerName === "cl.exe") {
 		const clArch: string = path
 			.basename(path.dirname(compilerPath))
@@ -1987,10 +2138,13 @@ function getIntelliSenseMode(
 		switch (clArch) {
 			case "arm64":
 				return canUseArm ? "msvc-arm64" : "msvc-x64";
+
 			case "arm":
 				return canUseArm ? "msvc-arm" : "msvc-x86";
+
 			case "x86":
 				return "msvc-x86";
+
 			case "x64":
 			default:
 				return "msvc-x64";
@@ -1999,6 +2153,7 @@ function getIntelliSenseMode(
 		switch (targetArch) {
 			case "arm64":
 				return canUseArm ? "clang-arm64" : "clang-x64";
+
 			case "arm":
 			default:
 				return canUseArm ? "clang-arm" : "clang-x86";
@@ -2007,10 +2162,13 @@ function getIntelliSenseMode(
 		switch (targetArch) {
 			case "arm64":
 				return canUseArm ? "clang-arm64" : "clang-x64";
+
 			case "arm":
 				return canUseArm ? "clang-arm" : "clang-x86";
+
 			case "x86":
 				return "clang-x86";
+
 			case "x64":
 			default:
 				return "clang-x64";
@@ -2028,6 +2186,7 @@ function getIntelliSenseMode(
 		switch (targetArch) {
 			case "x86":
 				return "gcc-x86";
+
 			case "x64":
 			default:
 				return "gcc-x64";
@@ -2056,6 +2215,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
 		["m32", "m64"],
 		["arch", "march", "target"],
 	);
+
 	let targetArch: util.TargetArchitecture; // this starts as undefined
 
 	possibleArchs.forEach((arch) => {
@@ -2078,6 +2238,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
 		} else {
 			// Check if ARM version is 7 or earlier.
 			const verStr: string | undefined = arch?.substr(4, 1);
+
 			if (verStr) {
 				const verNum: number = +verStr;
 
@@ -2098,9 +2259,12 @@ export function parseStandard(
 ): util.StandardVersion | undefined {
 	let canUseGnu: boolean =
 		cppVersion !== undefined && cppVersion >= cpp.Version.v4;
+
 	let canUseCxx23: boolean =
 		cppVersion !== undefined && cppVersion >= cpp.Version.v6;
+
 	let standard: util.StandardVersion | undefined;
+
 	if (cppVersion && cppVersion >= cpp.Version.v5 && std === undefined) {
 		// C/C++ standard is optional for CppTools v5+ and is determined by CppTools.
 		return undefined;
@@ -2145,6 +2309,7 @@ export function parseStandard(
 		if (!standard) {
 			standard = parseCStandard(std, canUseGnu);
 		}
+
 		if (!standard) {
 			logger.message(
 				localize(
@@ -2171,6 +2336,7 @@ function parseCppStandard(
 	canUseCxx23: boolean,
 ): util.StandardVersion | undefined {
 	const isGnu: boolean = canUseGnu && std.startsWith("gnu");
+
 	if (
 		std.endsWith("++23") ||
 		std.endsWith("++2b") ||
@@ -2204,6 +2370,7 @@ function parseCStandard(
 ): util.StandardVersion | undefined {
 	// GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
 	const isGnu: boolean = canUseGnu && std.startsWith("gnu");
+
 	if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
 		return isGnu ? "gnu89" : "c89";
 	} else if (/(c|gnu)(99|9x|iso9899:(1999|199x))/.test(std)) {

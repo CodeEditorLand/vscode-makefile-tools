@@ -221,6 +221,7 @@ export class Launcher implements vscode.Disposable {
 		if (miMode === "lldb" && process.platform === "darwin") {
 			const cpptoolsExtension: vscode.Extension<any> | undefined =
 				vscode.extensions.getExtension("ms-vscode.cpptools");
+
 			miDebuggerPath = cpptoolsExtension
 				? path.join(
 						cpptoolsExtension.extensionPath,
@@ -297,6 +298,7 @@ export class Launcher implements vscode.Disposable {
 		if (configuration.getBuildBeforeLaunch()) {
 			let currentBuildTarget: string =
 				configuration.getCurrentTarget() || "";
+
 			logger.message(
 				localize(
 					"building.current.target.before.launch",
@@ -374,6 +376,7 @@ export class Launcher implements vscode.Disposable {
 						op,
 					),
 				);
+
 				await configuration.selectLaunchConfiguration();
 
 				// Read again the current launch configuration. If a current launch configuration is stil not set
@@ -422,6 +425,7 @@ export class Launcher implements vscode.Disposable {
 
 			if (vscode.workspace.workspaceFolders) {
 				startFolder = vscode.workspace.workspaceFolders[0];
+
 				await vscode.debug.startDebugging(startFolder, debugConfig);
 			} else {
 				await vscode.debug.startDebugging(undefined, debugConfig);
@@ -435,6 +439,7 @@ export class Launcher implements vscode.Disposable {
 		let telemetryProperties: telemetry.Properties = {
 			status: status,
 		};
+
 		telemetry.logEvent("debug", telemetryProperties);
 
 		return vscode.debug.activeDebugSession;
@@ -456,6 +461,7 @@ export class Launcher implements vscode.Disposable {
 	public prepareRunCurrentTarget(): string {
 		// Add a pair of quotes just in case there is a space in the binary path
 		let terminalCommand: string = '"' + this.getLaunchTargetPath() + '" ';
+
 		terminalCommand += this.getLaunchTargetArgs().join(" ");
 
 		// Log the message for high verbosity only because the output channel will become visible over the terminal,
@@ -484,6 +490,7 @@ export class Launcher implements vscode.Disposable {
 		}
 
 		terminalOptions.cwd = this.getLaunchTargetDirectory();
+
 		terminalOptions.env = util.mergeEnvironment(
 			process.env as util.EnvironmentVariables,
 		);
@@ -505,12 +512,15 @@ export class Launcher implements vscode.Disposable {
 				configuration.getCurrentLaunchConfiguration();
 
 			let terminalCommand: string = this.prepareRunCurrentTarget();
+
 			this.launchTerminal.sendText(terminalCommand);
 
 			let telemetryProperties: telemetry.Properties = {
 				status: status,
 			};
+
 			telemetry.logEvent("run", telemetryProperties);
+
 			this.launchTerminal.show();
 		}
 

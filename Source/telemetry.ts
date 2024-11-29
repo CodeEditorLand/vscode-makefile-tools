@@ -16,7 +16,9 @@ export type Measures = { [key: string]: number };
 
 interface IPackageInfo {
 	name: string;
+
 	version: string;
+
 	aiKey: string;
 }
 
@@ -308,6 +310,7 @@ export async function analyzeSettings(
 			if (telemetryProperties) {
 				telemetryProperties[filterKey(key)] = setting;
 			}
+
 			break;
 
 		// Apply allow-lists for strings.
@@ -319,6 +322,7 @@ export async function analyzeSettings(
 					propSchema.default,
 				);
 			}
+
 			break;
 
 		case "array":
@@ -392,7 +396,9 @@ export async function analyzeSettings(
 							typeof newPropObj === "object"
 						) {
 							newProp = Object.getOwnPropertyNames(newPropObj)[0];
+
 							newPropObj = newPropObj[newProp];
+
 							newProp = "." + newProp;
 						} else {
 							newProp = "";
@@ -416,6 +422,7 @@ export async function analyzeSettings(
 						(jsonType !== "array" || prop !== "length")
 					) {
 						let newTelemetryProperties: Properties | null = {};
+
 						newTelemetryProperties = await analyzeSettings(
 							newPropObj,
 							key + "." + prop,
@@ -452,6 +459,7 @@ function createReporter(): TelemetryReporter | null {
 	if (packageInfo && packageInfo.aiKey) {
 		return new TelemetryReporter(packageInfo.aiKey);
 	}
+
 	return null;
 }
 

@@ -53,12 +53,14 @@ export function message(message: string, loggingLevel?: string): void {
 	}
 
 	let channel: vscode.OutputChannel = getOutputChannel();
+
 	channel.appendLine(message);
 
 	let extensionLog: string | undefined = configuration.getExtensionLog();
 
 	if (extensionLog) {
 		fs.appendFileSync(extensionLog, message);
+
 		fs.appendFileSync(extensionLog, "\n");
 	}
 }
@@ -73,6 +75,7 @@ export function messageNoCR(message: string, loggingLevel?: string): void {
 	}
 
 	let channel: vscode.OutputChannel = getOutputChannel();
+
 	channel.append(message);
 
 	let extensionLog: string | undefined = configuration.getExtensionLog();

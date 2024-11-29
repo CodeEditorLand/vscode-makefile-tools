@@ -77,10 +77,12 @@ export function checkFileExistsSync(filePath: string): boolean {
 		// These quotes become inner (not surrounding) quotes after we append various file names or do oher processing,
 		// making file sysem stats fail. Safe to remove here.
 		let filePathUnq: string = filePath;
+
 		filePathUnq = removeQuotes(filePathUnq);
 
 		return fs.statSync(filePathUnq).isFile();
 	} catch (e) {}
+
 	return false;
 }
 
@@ -88,6 +90,7 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
 	try {
 		return fs.statSync(directoryPath).isDirectory();
 	} catch (e) {}
+
 	return false;
 }
 
@@ -97,6 +100,7 @@ export function createDirectorySync(directoryPath: string): boolean {
 
 		return true;
 	} catch {}
+
 	return false;
 }
 
@@ -138,8 +142,10 @@ export function tmpDir(): string {
 			if (!fs.existsSync(xdg)) {
 				fs.mkdirSync(xdg);
 			}
+
 			return xdg;
 		}
+
 		return "/tmp";
 	}
 }
@@ -255,6 +261,7 @@ export async function killTree(
 				),
 			);
 		}
+
 		return;
 	}
 
@@ -306,6 +313,7 @@ export async function killTree(
 		logger.message(
 			localize("killing.process", "Killing process PID = {0}", pid),
 		);
+
 		progress.report({
 			increment: 1,
 			message: localize(
@@ -314,6 +322,7 @@ export async function killTree(
 				pid,
 			),
 		});
+
 		process.kill(pid, "SIGINT");
 	} catch (e) {
 		if (e.code !== "ESRCH") {
@@ -357,6 +366,7 @@ export let modifiedEnvironmentVariables: EnvironmentVariables = {};
 
 export interface SpawnProcessResult {
 	returnCode: number;
+
 	signal: string;
 }
 
@@ -402,6 +412,7 @@ export function spawnChildProcess(
 
 		let workspaceConfiguration: vscode.WorkspaceConfiguration =
 			vscode.workspace.getConfiguration("terminal");
+
 		shellType =
 			workspaceConfiguration.get<string>(
 				`integrated.automationProfile.${shellPlatform}`,
@@ -546,6 +557,7 @@ export async function ensureWindowsPath(path: string): Promise<string> {
 		winPath = winPath.substr(1);
 
 		const driveEndIndex: number = winPath.search("/");
+
 		winPath =
 			winPath.substring(0, driveEndIndex) +
 			":" +
@@ -584,6 +596,7 @@ export async function makeFullPaths(
 
 	for (const p of relPaths) {
 		let fullPath: string = await makeFullPath(p, curPath);
+
 		fullPaths.push(fullPath);
 	}
 
@@ -629,6 +642,7 @@ export function removeQuotes(str: string): string {
 			let regExpStr: string = `${quotesStr[p]}`;
 
 			let regExp: RegExp = RegExp(regExpStr, "g");
+
 			str = str.replace(regExp, "");
 		}
 	}
@@ -647,6 +661,7 @@ export function removeSplitUpParenthesis(strArray: string[]): string[] {
 		} else if (result.endsWith(")") && !result.startsWith("(")) {
 			result = result.substring(0, str.length - 2);
 		}
+
 		resultArray.push(result.trim());
 	}
 
@@ -699,6 +714,7 @@ export function escapeString(str: string): string {
 			escapedString += char;
 		}
 	}
+
 	return escapedString;
 }
 
@@ -778,6 +794,7 @@ export function hasProperties(obj: any): boolean {
 // To make things simpler for the caller, create a valid dst if given null or undefined.
 export function mergeProperties(dst: any, src: any): any {
 	let props: string[] = src ? Object.getOwnPropertyNames(src) : [];
+
 	props.forEach((prop) => {
 		if (!dst) {
 			dst = {};
@@ -805,9 +822,11 @@ export function removeDuplicates(src: string[]): string[] {
 	let seen: { [key: string]: boolean } = {};
 
 	let result: string[] = [];
+
 	src.forEach((item) => {
 		if (!seen[item]) {
 			seen[item] = true;
+
 			result.push(item);
 		}
 	});
@@ -827,24 +846,28 @@ export function reportDryRunError(dryrunOutputFile: string): void {
 			dryrunOutputFile,
 		),
 	);
+
 	logger.message(
 		localize(
 			"utils.dryrun.error.environment",
 			"Make sure that the extension is invoking the same make command as in your development prompt environment.",
 		),
 	);
+
 	logger.message(
 		localize(
 			"utils.dryrun.error.makefile",
 			"You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]",
 		),
 	);
+
 	logger.message(
 		localize(
 			"utils.dryrun.error.knownissues",
 			"Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches).",
 		),
 	);
+
 	logger.message(
 		localize(
 			"utils.dryrun.error.github",
@@ -899,6 +922,7 @@ export async function getExpandedSetting<T>(
 	if (!propSchema) {
 		propSchema =
 			thisExtensionPackage().contributes.configuration.properties;
+
 		propSchema = propSchema.properties
 			? propSchema.properties[`makefile.${settingId}`]
 			: propSchema[`makefile.${settingId}`];
@@ -913,14 +937,17 @@ export async function getExpandedSetting<T>(
 		copySettingVal = [];
 		(settingVal as any[]).forEach((element) => {
 			let copyElement: any = {};
+
 			copyElement =
 				typeof element === "object"
 					? Object.assign(copyElement, element)
 					: element;
+
 			copySettingVal.push(copyElement);
 		});
 	} else if (propSchema && propSchema.type === "object") {
 		copySettingVal = {};
+
 		copySettingVal = Object.assign(copySettingVal, settingVal);
 	} else {
 		copySettingVal = settingVal;
@@ -1080,7 +1107,9 @@ export async function expandVariablesInSetting(
 				settingVal,
 			),
 		);
+
 		telemetryProperties.pattern = "escaped";
+
 		telemetry.logEvent("varexp", telemetryProperties);
 
 		settingVal = preprocStr;
@@ -1102,30 +1131,38 @@ export async function expandVariablesInSetting(
 
 		if (result[2] === "workspaceFolder" || result[2] === "workspaceRoot") {
 			toStr = getWorkspaceRoot();
+
 			telemetryProperties.pattern = result[2];
 		} else if (result[2] === "workspaceFolderBasename") {
 			toStr = path.basename(getWorkspaceRoot());
+
 			telemetryProperties.pattern = result[2];
 		} else if (result[2] === "userHome") {
 			toStr = userHome();
+
 			telemetryProperties.pattern = result[2];
 		} else if (result[2] === "configuration") {
 			toStr = configuration.getCurrentMakefileConfiguration();
+
 			telemetryProperties.pattern = result[2];
 		} else if (result[2] === "buildTarget") {
 			toStr = configuration.getCurrentTarget() || "";
+
 			telemetryProperties.pattern = result[2];
 		} else if (result[4] === "env" && result[5]) {
 			toStr = process.env[result[5]] || "";
+
 			telemetryProperties.pattern = result[4];
 		} else if (result[4] === "command") {
 			telemetryProperties.pattern = result[4];
+
 			telemetryProperties.info = result[5];
 
 			try {
 				toStr = await vscode.commands.executeCommand(result[5]);
 			} catch (e) {
 				toStr = "unknown";
+
 				logger.message(
 					localize(
 						"exception.executing",
@@ -1139,6 +1176,7 @@ export async function expandVariablesInSetting(
 			// Extract the name of the extension we read this setting from (before the dot)
 			// and the setting follows the first dot.
 			telemetryProperties.pattern = result[4];
+
 			telemetryProperties.info = result[5];
 
 			const regexpCfg: RegExp = /(\w+)\.(.+)/gm;
@@ -1148,6 +1186,7 @@ export async function expandVariablesInSetting(
 			if (res && res[1] && res[2]) {
 				let workspaceCfg: vscode.WorkspaceConfiguration =
 					vscode.workspace.getConfiguration(res[1]);
+
 				toStr = workspaceCfg.get(res[2]) as string;
 
 				// The setting is either undefined or maybe we encountered a case with multiple names separated by dot for a property:
@@ -1180,7 +1219,9 @@ export async function expandVariablesInSetting(
 					result[0],
 				),
 			);
+
 			toStr = "unknown";
+
 			telemetryProperties.pattern = "unrecognized";
 		}
 
@@ -1204,12 +1245,14 @@ export async function expandVariablesInSetting(
 					toStr,
 				),
 			);
+
 			expandedSetting = expandedSetting.replace(result[0], "unknown");
 		} else {
 			expandedSetting = expandedSetting.replace(result[0], toStr);
 		}
 
 		regexpVSCodeVar.lastIndex = 0;
+
 		result = regexpVSCodeVar.exec(expandedSetting);
 	}
 
@@ -1245,11 +1288,13 @@ function getSettingMultipleDots(scope: any, settingId: string): any {
 
 	if (scope) {
 		let rootProps: string[] = Object.getOwnPropertyNames(scope);
+
 		rootProps = rootProps.filter(
 			(item) =>
 				item &&
 				(settingId.startsWith(`${item}.`) || settingId === item),
 		);
+
 		rootProps.forEach((prop) => {
 			if (settingId === prop) {
 				result = scope[prop];
@@ -1272,6 +1317,7 @@ export function scheduleTask<T>(task: () => T): Promise<T> {
 		setImmediate(() => {
 			try {
 				const result: T = task();
+
 				resolve(result);
 			} catch (e) {
 				reject(e);
@@ -1286,6 +1332,7 @@ export async function scheduleAsyncTask<T>(task: () => Promise<T>): Promise<T> {
 		setImmediate(async () => {
 			try {
 				const result: T = await task();
+
 				resolve(result);
 			} catch (e) {
 				reject(e);
@@ -1307,8 +1354,11 @@ export function thisExtension(): vscode.Extension<any> {
 
 export interface PackageJSON {
 	name: string;
+
 	publisher: string;
+
 	version: string;
+
 	contributes: any;
 }
 
